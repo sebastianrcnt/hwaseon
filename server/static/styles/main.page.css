@@ -1,0 +1,88 @@
+.container {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.logo {
+  text-align: center;
+  font: normal normal 800 100px/100px Noto Sans;
+  letter-spacing: 0.1px;
+  color: #ff6633;
+  text-transform: uppercase;
+  opacity: 1;
+  cursor: pointer;
+  margin-bottom: 50px;
+}
+
+.search-bar-container {
+  top: 440px;
+  left: 421px;
+  width: 1079px;
+  height: 63px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  border: 1px solid #ff6633;
+  opacity: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+  margin-bottom: 86px;
+}
+.search-bar-container input.search-input {
+  all: unset;
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.03px;
+  opacity: 1;
+  font-size: 30px;
+}
+.search-bar-container input.search-input::placeholder {
+  color: #878787;
+}
+.search-bar-container button.search-button {
+  all: unset;
+  width: 72px;
+  background-color: #ff6633;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.search-bar-container button.search-button span {
+  color: white;
+  font-size: 2.5rem;
+}
+
+.features {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 800px;
+}
+.features .feature {
+  all: unset;
+  font-size: 20px;
+  letter-spacing: 0.02px;
+  color: #878787;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+.features .feature.selected, .features .feature:hover {
+  color: #ff6633;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+}
+footer div {
+  color: #4a4a4a;
+}
+
+/*# sourceMappingURL=main.page.css.map */
