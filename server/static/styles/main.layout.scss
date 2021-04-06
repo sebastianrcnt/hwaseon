@@ -48,3 +48,11 @@ h6 {
   /* Support for IE. */
   font-feature-settings: "liga";
 }
+
+footer {
+  position: absolute;
+  bottom: 0;
+  div {
+    color: #4a4a4a;
+  }
+}

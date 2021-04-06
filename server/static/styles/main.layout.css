@@ -46,4 +46,12 @@ h6 {
   font-feature-settings: "liga";
 }
 
+footer {
+  position: absolute;
+  bottom: 0;
+}
+footer div {
+  color: #4a4a4a;
+}
+
 /*# sourceMappingURL=main.layout.css.map */
