@@ -1,0 +1,102 @@
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  all: unset;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+header {
+  position: fixed;
+  top: 0;
+
+  .header-container {
+    width: 100vw;
+    height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 3px 6px #3432325c;
+
+    .logo {
+      width: 90vw;
+      font-size: 50px;
+      font-weight: 800;
+      letter-spacing: 0.05px;
+      color: #ff6633;
+      text-transform: uppercase;
+      opacity: 1;
+    }
+  }
+
+  nav.navbar {
+    padding-top: 27px;
+    border-bottom: 1px solid #999;
+    padding-bottom: 17px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    li {
+      list-style-type: none;
+      font-size: 20px;
+      letter-spacing: 0.02px;
+      color: #878787;
+      font-weight: 300;
+
+      &:not(:last-child) {
+        margin-right: 145px;
+      }
+
+      &.current {
+        color: #ff6633;
+      }
+    }
+  }
+}
