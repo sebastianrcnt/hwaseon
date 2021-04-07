@@ -19,6 +19,9 @@ body {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 h1,
@@ -57,6 +60,7 @@ h6 {
 header {
   position: fixed;
   top: 0;
+  border-bottom: 1px solid #999;
 }
 
 header .header-container {
@@ -76,7 +80,6 @@ header .header-container {
 }
 
 header .header-container .logo {
-  width: 90vw;
   font-size: 50px;
   font-weight: 800;
   letter-spacing: 0.05px;
@@ -86,9 +89,6 @@ header .header-container .logo {
 }
 
 header nav.navbar {
-  padding-top: 27px;
-  border-bottom: 1px solid #999;
-  padding-bottom: 17px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -105,6 +105,9 @@ header nav.navbar {
 }
 
 header nav.navbar li {
+  padding-top: 27px;
+  padding-bottom: 17px;
+  height: 100%;
   list-style-type: none;
   font-size: 20px;
   letter-spacing: 0.02px;
@@ -118,5 +121,16 @@ header nav.navbar li:not(:last-child) {
 
 header nav.navbar li.current {
   color: #ff6633;
+  border-bottom: #ff6633 2px solid;
+  font-weight: bold;
+}
+
+.container,
+.logo {
+  width: 90vw;
+}
+
+.header-ghost {
+  height: 168px;
 }
 /*# sourceMappingURL=feature.layout.css.map */

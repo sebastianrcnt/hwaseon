@@ -6,6 +6,6 @@ app = Flask(__name__)
 def home():
   return render_template('pages/home.html')
 
-@app.route('/feature')
+@app.route('/feature1')
 def feature():
   return render_template("pages/feature1.html")
