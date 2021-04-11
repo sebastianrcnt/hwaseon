@@ -60,6 +60,7 @@ h6 {
 header {
   position: fixed;
   top: 0;
+  background-color: white;
   border-bottom: 1px solid #999;
 }
 
@@ -130,7 +131,7 @@ header nav.navbar li.current {
   width: 90vw;
 }
 
-.header-ghost {
-  height: 168px;
+.container {
+  padding-top: 180px;
 }
 /*# sourceMappingURL=feature.layout.css.map */

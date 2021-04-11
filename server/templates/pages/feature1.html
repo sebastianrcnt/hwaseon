@@ -1,9 +1,6 @@
 {% extends 'layouts/feature.html' %} {% block title %}This is a Title{% endblock
 %} {% block content %}
-<link
-  rel="stylesheet"
-  href="{{url_for('static', filename='styles/feature1.page.css')}}"
-/>
+<link rel="stylesheet" href="{{url_for('static', filename='styles/feature1.page.css')}}" />
 <header>
   <div class="header-container">
     <div class="logo">HWASEON</div>
@@ -15,7 +12,6 @@
     <li class="current">블로그 노출 확인</li>
   </nav>
 </header>
-<div class="header-ghost"></div>
 <div class="container">
   <!-- 1행 -->
   <section class="row row1">
@@ -101,7 +97,7 @@
         </div>
         <div class="right">직접입력</div>
       </div>
-      <canvas id="myChart"></canvas>
+      <canvas id="myChart" width="300" height="300"></canvas>
     </div>
   </section>
 
@@ -296,9 +292,30 @@
   </section>
 
   <section class="row row3">
-    <h3 class="section-title">
-      관련 키워드 현황 (N 자동완성 / N쇼핑 자동완성 / 연관검색어)
-    </h3>
+    <div class="section-header">
+      <div class="section-title">
+        카테고리 인기검색어
+      </div>
+      <div class="section-description">
+        관련 카테고리 인기검색어<br />순위변동 - 30일 전과 비교
+      </div>
+      <div class="category-criterion">
+        <div class="category category-1"><input type="text" placeholder="1차 카테고리" class="category-input">
+          <span class="material-icons"> arrow_right </span>
+        </div>
+        <div class="category category-2"><input type="text" placeholder="2차 카테고리" class="category-input">
+          <span class="material-icons"> arrow_right </span>
+        </div>
+        <div class="category category-3"><input type="text" placeholder="3차 카테고리" class="category-input">
+          <span class="material-icons"> arrow_right </span>
+        </div>
+        <div class="category category-4"><input type="text" placeholder="4차 카테고리" class="category-input">
+          <div class="search-button">
+            <span class="material-icons search-button">search</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="divider"></div>
     <table id="table2">
       <thead>
@@ -327,6 +344,19 @@
       </tbody>
     </table>
   </section>
+  <section class="row row4">
+    <div class="category-header">
+      <form class="search-bar-container">
+        <input type="text" />
+        <button class="search-button" type="submit">
+          <span class="material-icons"> search </span>
+        </button>
+      </form>
+      <div>
+        해당 키워드 N쇼핑 판매량(Npay 기준 | 최근 7일간)
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -346,6 +376,8 @@
       ],
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
