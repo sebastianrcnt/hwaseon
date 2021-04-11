@@ -1,0 +1,88 @@
+{% extends 'layouts/feature.html' %} {% block title %}This is a Title{% endblock
+%} {% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='styles/feature3.page.css')}}" />
+<header>
+    <div class="header-container">
+        <div class="logo">HWASEON</div>
+    </div>
+    <nav class="navbar">
+        <li>키워드 분석 / 카테고리 현황</li>
+        <li class="current">제품 트래킹 (N&C) / 키워드별 예상 판매(N)</li>
+        <li>대량키워드 요약</li>
+        <li>블로그 노출 확인</li>
+    </nav>
+</header>
+<div class="container">
+    <section class="row keyword-filter">
+        <div class="left">
+            <div class="market-selector input-table">
+                <div class="left-cell">
+                    <label for="">마켓 선택</label>
+                </div>
+                <div class="right-cell">
+                    <select name="" id="">
+                        <option value="naver">스토어팜</option>
+                        <option value="coupang">쿠팡</option>
+                    </select>
+                </div>
+            </div>
+            <div class="url-input input-table">
+                <div class="left-cell">
+                    <label for="">URL 입력</label>
+                </div>
+                <div class="right-cell">
+                    <input type="text" placeholder="enter url">
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="description">
+                    네이버 URL 확인방법 - 유튜브 링크<br>
+                    쿠팡 URL 확인방법 - 유튜브 링크
+                </div>
+                <div class="search-button">
+                    검색하기
+                </div>
+            </div>
+        </div>
+        <div class="right input-table">
+            <div class="left-cell">
+                <span>
+                    키워드 입력<br>
+                    콤마(구분)
+                </span>
+            </div>
+            <div class="right-cell">
+                <textarea class="keywords-input"
+                    placeholder="ex) 1회 Max 10개까지 가능합니다. 샴푸, 탈모샴푸, 탈모에좋은샴푸, 향기좋은샴푸, 샴푸특가"></textarea>
+            </div>
+        </div>
+    </section>
+    <section class="row search-filter-1">
+        <div class="divider"></div>
+        <table id="table1">
+            <thead>
+                <tr>
+                    <th>키워드</th>
+                    <th>순위</th>
+                    <th>검색량</th>
+                    <th>상품수</th>
+                    <th>상품경쟁률</th>
+                    <th>PC 월검색량</th>
+                    <th>MO 월검색량</th>
+                    <th>MO 광고클릭</th>
+                    <th>PC 광고클릭</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#table1").DataTable();
+        $("#table2").DataTable();
+    });
+</script>
+
+{% endblock %}

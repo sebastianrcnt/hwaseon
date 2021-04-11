@@ -136,7 +136,7 @@ header nav.navbar li.current {
 }
 
 table thead {
-  background-color: #ff6633;
+  background-color: rgba(255, 102, 51, 0.8);
 }
 
 table tbody {
@@ -159,5 +159,176 @@ button {
   color: gray;
   background-color: #ffcdbc;
   border-radius: 10px;
+}
+
+.input-table {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-pack: stretch;
+      -ms-flex-pack: stretch;
+          justify-content: stretch;
+}
+
+.input-table .left-cell,
+.input-table .right-cell {
+  border: 1px solid #ff6633;
+  color: grey;
+  padding: 5px 0;
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.input-table .left-cell {
+  width: 100px;
+}
+
+.input-table .right-cell {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.input-table .right-cell select,
+.input-table .right-cell input,
+.input-table .right-cell textarea {
+  all: unset;
+  width: 100%;
+  height: 100%;
+}
+
+section.keyword-filter {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  color: grey;
+}
+
+section.keyword-filter .left {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  margin-right: 30px;
+}
+
+section.keyword-filter .left .market-selector,
+section.keyword-filter .left .url-input {
+  width: 492px;
+  margin-bottom: 10px;
+}
+
+section.keyword-filter .left .bottom {
+  width: 492px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+section.keyword-filter .left .bottom .search-button {
+  top: 324px;
+  left: 614px;
+  width: 123px;
+  height: 46px;
+  background: #ffcdbc;
+  border-radius: 10px;
+  opacity: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+section.keyword-filter .right {
+  width: 100%;
+  height: 162px;
+}
+
+section.keyword-filter .right .left-cell {
+  width: 135px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+section.keyword-filter .right .left-cell span {
+  text-align: center;
+}
+
+section.keyword-filter .right .right-cell {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+section.keyword-filter .right .right-cell textarea {
+  padding: 28px 18px;
 }
 /*# sourceMappingURL=feature.layout.css.map */

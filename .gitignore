@@ -2,5 +2,5 @@
 .venv/
 **/*/__pycache__/
 __pycache__/
-**/*.css
-**/*.css.map
+server/static/styles/*.css
+server/static/styles/*.css.map
