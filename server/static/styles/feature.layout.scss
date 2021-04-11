@@ -113,3 +113,13 @@ header {
 .container {
   padding-top: 180px;
 }
+
+table {
+  thead {
+    background-color: #ff6633;
+  }
+
+  tbody {
+    text-align: center;
+  }
+}

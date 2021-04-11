@@ -222,14 +222,6 @@ section.row.row1 .search-graph .search-graph-header .left .pill.primary {
   border-color: #ff6633;
 }
 
-table thead {
-  background-color: #ff6633;
-}
-
-table tbody {
-  text-align: center;
-}
-
 section.row.row3 .section-header {
   display: -webkit-box;
   display: -ms-flexbox;

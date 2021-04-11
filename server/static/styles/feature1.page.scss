@@ -115,16 +115,6 @@ section.row.row1 {
   }
 }
 
-table {
-  thead {
-    background-color: #ff6633;
-  }
-
-  tbody {
-    text-align: center;
-  }
-}
-
 section.row.row3 {
   .section-header {
     @include flex(row, flex-start, center);

@@ -134,4 +134,12 @@ header nav.navbar li.current {
 .container {
   padding-top: 180px;
 }
+
+table thead {
+  background-color: #ff6633;
+}
+
+table tbody {
+  text-align: center;
+}
 /*# sourceMappingURL=feature.layout.css.map */
