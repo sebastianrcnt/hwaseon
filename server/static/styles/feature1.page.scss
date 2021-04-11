@@ -1,9 +1,5 @@
 @import "./utils.scss";
 
-section {
-  margin-bottom: 40px;
-}
-
 .search-bar-container {
   top: 220px;
   left: 240px;
@@ -164,11 +160,4 @@ section.row.row3 {
     color: #000000;
     opacity: 0.64;
   }
-}
-
-.divider {
-  margin: 20px 0;
-  background-color: gray;
-  width: 100%;
-  height: 4px;
 }

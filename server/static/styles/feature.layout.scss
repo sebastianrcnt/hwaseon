@@ -123,3 +123,21 @@ table {
     text-align: center;
   }
 }
+
+.divider {
+  margin: 20px 0;
+  background-color: #aaa;
+  width: 100%;
+  height: 1px;
+}
+
+section {
+  margin-bottom: 40px;
+}
+
+button {
+  all: unset;
+  color: gray;
+  background-color: #ffcdbc;
+  border-radius: 10px;
+}

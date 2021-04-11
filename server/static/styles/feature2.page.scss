@@ -9,6 +9,8 @@
     color: grey;
     padding: 5px 0;
     text-align: center;
+
+    @include flex(row, center, center);
   }
 
   .left-cell {
@@ -84,8 +86,37 @@ section.keyword-filter {
 
 section.search-filter-1 {
   .section-header {
-    .store-name {
+    @include flex(row, flex-start, center);
+
+    .store-name,
+    .keyword-name {
       width: 350px;
+      height: 42px;
+      margin-right: 10px;
+    }
+
+    button.search-button-1 {
+      padding: 10px 15px;
+    }
+  }
+}
+
+section.search-filter-2 {
+  h3 {
+    color: #ff6633;
+  }
+
+  .section-header {
+    margin-top: 20px;
+    @include flex(row);
+    .keyword-name {
+      width: 350px;
+      height: 42px;
+      margin-right: 10px;
+    }
+
+    button.search-button-2 {
+      padding: 10px 15px;
     }
   }
 }
