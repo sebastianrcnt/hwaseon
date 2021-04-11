@@ -1,0 +1,31 @@
+@import "./utils.scss";
+
+section.blog-id-search {
+  @include flex(row, center, center);
+
+  .left {
+    width: 497px;
+    .blog-id-input {
+      margin-bottom: 10px;
+    }
+    .bottom {
+      @include flex(row, space-between, center);
+      button {
+        border-radius: 0;
+        padding: 10px 35px;
+      }
+    }
+
+    margin-right: 20px;
+  }
+
+  .right {
+    flex: 1;
+    @include flex(column);
+    text-align: left;
+    font-size: 18px;
+    letter-spacing: 0.02px;
+    color: #878787;
+    opacity: 1;
+  }
+}

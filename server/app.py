@@ -26,3 +26,8 @@ def feature3():  # naver
 @app.route("/feature4")
 def feature4():  # 대량키워드 요약
     return render_template('pages/feature4.html')
+
+
+@app.route("/feature5")
+def feature5():  # 대량키워드 요약
+    return render_template('pages/feature5.html')
