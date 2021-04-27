@@ -163,4 +163,8 @@ section.row.row3 h3.section-title {
   opacity: 0.64;
 }
 
+table#table3 th {
+  background-color: green;
+}
+
 /*# sourceMappingURL=feature1.page.css.map */

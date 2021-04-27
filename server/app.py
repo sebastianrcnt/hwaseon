@@ -18,10 +18,6 @@ def feature2():  # coupang
     return render_template("pages/feature2.html")
 
 
-@app.route('/feature3')
-def feature3():  # naver
-    return render_template('pages/feature3.html')
-
 
 @app.route("/feature4")
 def feature4():  # 대량키워드 요약

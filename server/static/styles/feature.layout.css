@@ -1,5 +1,4 @@
 * {
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   font-family: sans-serif;
 }
@@ -12,15 +11,8 @@ body {
 body {
   width: 100vw;
   height: 100vh;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
   flex-direction: column;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
 }
 
@@ -53,7 +45,6 @@ h6 {
   /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
   /* Support for IE. */
-  -webkit-font-feature-settings: "liga";
   font-feature-settings: "liga";
 }
 
@@ -63,23 +54,14 @@ header {
   background-color: white;
   border-bottom: 1px solid #999;
 }
-
 header .header-container {
   width: 100vw;
   height: 94px;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
-  -webkit-box-shadow: 0px 3px 6px #3432325c;
   box-shadow: 0px 3px 6px #3432325c;
 }
-
 header .header-container .logo {
   font-size: 50px;
   font-weight: 800;
@@ -88,23 +70,12 @@ header .header-container .logo {
   text-transform: uppercase;
   opacity: 1;
 }
-
 header nav.navbar {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
-
 header nav.navbar .menu {
   display: block;
   padding-top: 27px;
@@ -117,11 +88,9 @@ header nav.navbar .menu {
   font-weight: 300;
   text-decoration: none;
 }
-
 header nav.navbar .menu:not(:last-child) {
   margin-right: 145px;
 }
-
 header nav.navbar .menu.current {
   color: #ff6633;
   border-bottom: #ff6633 2px solid;
@@ -140,7 +109,6 @@ header nav.navbar .menu.current {
 table thead {
   background-color: rgba(255, 102, 51, 0.8);
 }
-
 table tbody {
   text-align: center;
 }
@@ -164,53 +132,31 @@ button {
 }
 
 .input-table {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
   align-items: stretch;
-  -webkit-box-pack: stretch;
-  -ms-flex-pack: stretch;
   justify-content: stretch;
 }
-
 .input-table .left-cell,
 .input-table .right-cell {
   border: 1px solid #ff6633;
   color: grey;
   padding: 10px 0;
   text-align: center;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
-
 .input-table .left-cell {
   width: 100px;
 }
-
 .input-table .right-cell {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
   flex: 1;
 }
-
-.input-table .right-cell select,
+.input-table .right-cell select {
+  all: unset;
+}
 .input-table .right-cell input,
 .input-table .right-cell textarea {
   all: unset;
@@ -219,62 +165,31 @@ button {
 }
 
 section.keyword-filter {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   color: grey;
 }
-
 section.keyword-filter .left {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
   flex-direction: column;
-  -webkit-box-align: start;
-  -ms-flex-align: start;
   align-items: flex-start;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
   justify-content: flex-start;
   margin-right: 30px;
 }
-
 section.keyword-filter .left .market-selector,
 section.keyword-filter .left .url-input {
   width: 492px;
   margin-bottom: 10px;
 }
-
 section.keyword-filter .left .bottom {
   width: 492px;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
   justify-content: space-between;
 }
-
 section.keyword-filter .left .bottom .search-button {
   top: 324px;
   left: 614px;
@@ -283,57 +198,30 @@ section.keyword-filter .left .bottom .search-button {
   background: #ffcdbc;
   border-radius: 10px;
   opacity: 1;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
-
 section.keyword-filter .right {
   width: 100%;
   height: 162px;
 }
-
 section.keyword-filter .right .left-cell {
-  width: 135px;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  width: 200px;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
   flex-direction: column;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
-
 section.keyword-filter .right .left-cell span {
   text-align: center;
 }
-
 section.keyword-filter .right .right-cell {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
   flex: 1;
 }
-
 section.keyword-filter .right .right-cell textarea {
   padding: 28px 18px;
 }
-
-/*# sourceMappingURL=feature.layout.css.map */
 
 /*# sourceMappingURL=feature.layout.css.map */

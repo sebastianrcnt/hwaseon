@@ -165,7 +165,11 @@ button {
 
   .right-cell {
     flex: 1;
-    select,
+
+    select {
+      all: unset;
+    }
+
     input,
     textarea {
       all: unset;
@@ -212,7 +216,7 @@ section.keyword-filter {
     height: 162px;
 
     .left-cell {
-      width: 135px;
+      width: 200px;
       @include flex(column, center, center);
 
       span {
