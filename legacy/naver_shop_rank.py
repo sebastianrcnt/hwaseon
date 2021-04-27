@@ -148,4 +148,4 @@ df = pd.DataFrame(main_list, columns=[
                   '키워드', '광고구분', '순위', '묶순', '상점명', '제품명', 'nvmid', 'shopid', '페이지'])
 df = df.sort_values(by=['키워드', '페이지', '순위', '묶순'], ascending=True)
 df = df.reset_index(drop=True)
-print(df)
+df.to_csv('./result2.csv')

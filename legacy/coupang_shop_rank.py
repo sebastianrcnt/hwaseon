@@ -108,4 +108,5 @@ print("--- %s seconds ---" % (time.time() - start_time))
 df = pd.DataFrame(main_list, columns=['페이지', '광고구분', '순위', 'item_id', '제품명'])
 df = df.sort_values(by=['페이지', '순위'], ascending=True)
 df = df.reset_index(drop=True)
-print(df)
+
+df.to_csv("./result.csv")

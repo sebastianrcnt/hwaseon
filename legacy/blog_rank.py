@@ -31,7 +31,8 @@ idid = 'like5183'
 #### 블로그 최신글 10개 가져오기 ###
 #### selenium ###
 # 크롬 켜기
-driver = webdriver.Chrome('C:/chromedriver.exe')
+# driver = webdriver.Chrome('C:/chromedriver.exe')
+driver = webdriver.Chrome("drivers/chromedriver")
 # 주소 접속. 꼭 모바일로 접속하기
 driver.get('https://m.blog.naver.com/'+idid)
 sleep(0.5)
@@ -199,4 +200,4 @@ df4 = df4.reset_index(drop=True)
 ### 결과 값 ###
 df_final = pd.merge(df3, df4, on="URL", how='left')
 
-print(df_final)
+df_final.to_csv("./result.csv")
