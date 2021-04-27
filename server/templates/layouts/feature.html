@@ -35,7 +35,23 @@
   </head>
 
   <body>
+    <header>
+      <div class="header-container">
+        <div class="logo">HWASEON</div>
+      </div>
+      <nav class="navbar" id="navbar">
+        <a class="menu" href="/feature1">키워드 분석 / 카테고리 현황</a>
+        <a class="menu" href="/feature2"
+          >제품 트래킹 (N&C) / 키워드별 예상 판매(N)</a
+        >
+        <a class="menu" href="/feature3">대량키워드 요약</a>
+        <a class="menu" href="/feature4">블로그 노출 확인</a>
+      </nav>
+    </header>
     {% block content %} {% endblock %}
-    
   </body>
+  <script>
+    const url = new URL(window.location);
+    $("#navbar").find(`.menu[href='${url.pathname}']`).toggleClass("current");
+  </script>
 </html>

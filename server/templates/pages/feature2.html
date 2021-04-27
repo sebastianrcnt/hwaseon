@@ -1,17 +1,6 @@
 {% extends 'layouts/feature.html' %} {% block title %}This is a Title{% endblock
 %} {% block content %}
 <link rel="stylesheet" href="{{url_for('static', filename='styles/feature2.page.css')}}" />
-<header>
-    <div class="header-container">
-        <div class="logo">HWASEON</div>
-    </div>
-    <nav class="navbar">
-        <li>키워드 분석 / 카테고리 현황</li>
-        <li class="current">제품 트래킹 (N&C) / 키워드별 예상 판매(N)</li>
-        <li>대량키워드 요약</li>
-        <li>블로그 노출 확인</li>
-    </nav>
-</header>
 <div class="container">
     <section class="row keyword-filter">
         <div class="left">

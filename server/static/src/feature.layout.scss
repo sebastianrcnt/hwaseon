@@ -84,7 +84,8 @@ header {
     align-items: center;
     justify-content: center;
 
-    li {
+    .menu {
+      display: block;
       padding-top: 27px;
       padding-bottom: 17px;
       height: 100%;
@@ -93,6 +94,7 @@ header {
       letter-spacing: 0.02px;
       color: #878787;
       font-weight: 300;
+      text-decoration: none;
 
       &:not(:last-child) {
         margin-right: 145px;
