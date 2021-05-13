@@ -5,3 +5,4 @@ __pycache__/
 server/static/styles/*.css
 server/static/styles/*.css.map
 drivers/*
+result*
