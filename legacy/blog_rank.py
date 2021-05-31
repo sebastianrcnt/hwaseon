@@ -32,7 +32,10 @@ idid = 'like5183'
 #### selenium ###
 # 크롬 켜기
 # driver = webdriver.Chrome('C:/chromedriver.exe')
-driver = webdriver.Chrome("drivers/chromedriver")
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+driver = webdriver.Chrome('./chromedriver', chrome_options=options)
+# driver = webdriver.Chrome("drivers/chromedriver")
 # 주소 접속. 꼭 모바일로 접속하기
 driver.get('https://m.blog.naver.com/'+idid)
 sleep(0.5)
@@ -147,7 +150,7 @@ def viewrank(keyword):
         soup = BeautifulSoup(req, 'html.parser')
         # 첫페이지 40여개 파싱
         search_all = soup.find_all('a', {'class': 'api_txt_lines total_tit'})
-        # 랭킹용 숫자
+        # View 순위용 숫자
         rank_numb = 0
         ###
         for k in range(0, len(search_all)):
@@ -162,7 +165,7 @@ def viewrank(keyword):
                 # 제목
                 title = search_all[k].text
                 list_sub.append(keyword)
-                list_sub.append(title)
+                list_sub.append(title) 
                 list_sub.append(search_all[k]['href'])
                 list_sub.append(noad_view_count)
                 list_sub.append(adview_count)
@@ -175,8 +178,8 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
     executor.map(viewrank, key_list)
 
 df2 = pd.DataFrame(list_main, columns=[
-                   '랭킹', '키워드', '제목', 'URL', '통합View 노출수', '통합View AD수'])
-df2 = df2.sort_values(by=['키워드', '랭킹', ], ascending=True)
+                   'View 순위', '키워드', '제목', 'URL', '통합View 노출수', '통합View AD수'])
+df2 = df2.sort_values(by=['키워드', 'View 순위', ], ascending=True)
 df2 = df2.reset_index(drop=True)
 
 ### 값 체크하기 ###
@@ -184,7 +187,7 @@ ranking_list = []
 for i in range(0, len(list_main)):
     testlist = []
     if df2['URL'][i] in list(df3['URL']):
-        testlist.append(int(df2['랭킹'][i]))
+        testlist.append(int(df2['View 순위'][i]))
         testlist.append(str(df2['URL'][i]))
         testlist.append(str(df2['통합View 노출수'][i]))
         testlist.append(str(df2['통합View AD수'][i]))
@@ -193,11 +196,12 @@ for i in range(0, len(list_main)):
         pass
 
 df4 = pd.DataFrame(ranking_list, columns=[
-                   '랭킹', 'URL', '통합View 노출수', '통합View AD수'])
-df4 = df4.sort_values(by=['랭킹', 'URL', ], ascending=True)
+                   'View 순위', 'URL', '통합View 노출수', '통합View AD수'])
+df4 = df4.sort_values(by=['View 순위', 'URL', ], ascending=True)
 df4 = df4.reset_index(drop=True)
 
 ### 결과 값 ###
 df_final = pd.merge(df3, df4, on="URL", how='left')
 
-df_final.to_csv("./result.csv")
+x = df_final.to_csv()
+# print(x)
