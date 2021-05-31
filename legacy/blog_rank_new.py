@@ -23,6 +23,7 @@ NAVER_MOBILE_BLOG_SEARCH_BASE_URL = 'https://m.search.naver.com/search.naver?sm=
 
 
 def get_active_html(url):
+    '''CSR 완료된 HTML 가져오기'''
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver = webdriver.Chrome('./chromedriver', options=options)
@@ -35,6 +36,7 @@ def get_active_html(url):
     return html
 
 def get_blog_data(blog_id):
+    '''블로그 정보 가져오기'''
     url = urljoin(BLOG_BASE_URL, blog_id)
     html = get_active_html(url)
     soup = BeautifulSoup(html,'html.parser')
@@ -64,6 +66,7 @@ def get_blog_data(blog_id):
     
 
 def get_blog_post_hashtags(post_url):
+    '''블로그 포스트가 태그된 해시태그 목록 가져오기'''
     soup = BeautifulSoup(requests.get(post_url).text, 'html.parser')
     tags_element = soup.select_one('.post_tag')
 
