@@ -63,6 +63,10 @@ def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     """
     네이버 블로그 월 발행량 가져오기(기간별)
     """
+
+    month = datetime.now().month
+    year = datetime.now().year
+
     headers = {
         'authority': 'section.blog.naver.com',
         'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -82,63 +86,57 @@ def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
         'keyword': keyword,
         'orderBy': 'sim',
         'type': 'post',
+        'startDate': f'{year}-{(month-1):02}-01',
+        'endDate': f'{year}-{(month):02}-01',
     }
 
-    if startDate:
-        params['startDate'] = startDate
-    if endDate:
-        params['endDate'] = endDate
 
     response = requests.get(
         'https://section.blog.naver.com/ajax/SearchList.nhn', headers=headers, params=params)
 
     # 월 발행량
-    raw = response.text[6:]
+    raw = response.text[6:] # 앞에 쓸데없는 뭐가 많음
     res = json.loads(raw)
     return res['result']['totalCount']
 
-def getMonthlyPublishedCafePosts(keyword, startDate=None, endDate=None):
+
+def getMonthlyPublishedCafePosts(keyword):
     """
     네이버 카페 월 발행량 가져오기(기간별)
     """
 
+    month = datetime.now().month
+    year = datetime.now().year
+
     headers = {
         'authority': 'apis.naver.com',
-        'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
         'accept': 'application/json, text/plain, */*',
         'x-cafe-product': 'pc',
         'sec-ch-ua-mobile': '?0',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+        'content-type': 'application/json;charset=UTF-8',
         'origin': 'https://cafe.naver.com',
         'sec-fetch-site': 'same-site',
         'sec-fetch-mode': 'cors',
         'sec-fetch-dest': 'empty',
-        'referer': 'https://cafe.naver.com/ca-fe/home/search/combinations?q=%EC%B9%B4%ED%8E%98',
-        'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'referer': 'https://cafe.naver.com/ca-fe/home/search/articles?q=%EA%B0%80%EC%9C%84&pr=3',
+        'accept-language': 'en',
     }
 
-    month = datetime.now().month
-    year = datetime.now().year
-
-    params = {
-        'query': keyword,
-        'size': '10',
-        'recommendKeyword': 'true',
-        'writeTime.min': f'{year}{(month-1):02}01' + '000000',
-        'writeTime.max': f'{year}{(month):02}01' + '000000',
+    data = {
+        "query": keyword,
+        "page": 1,
+        "sortBy": 0,
+        "period": [f"{year}{(month-1):02}01", f"{year}{(month):02}01"]
     }
 
-    # if startDate:
-    #     params['startDate'] = startDate
-    # if endDate:
-    #     params['endDate'] = endDate
+    data = json.dumps(data)
 
-    response = requests.get(
-        'https://apis.naver.com/cafe-web/cafe-search-api/v1.0/trade-search/all', headers=headers, params=params)
+    response = requests.post('https://apis.naver.com/cafe-home-web/cafe-home/v1/search/articles', headers=headers, data=data.encode('utf-8'))
 
-    # 월 발행량
-    # return response.text
-    return response.json()['result']['totalCount']
+    return int(response.json()['message']['result']['totalCount'])
+
 
 # 검색량
 # https://datalab.naver.com/shoppingInsight/getCategory.naver?cid=0

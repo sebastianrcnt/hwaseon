@@ -5,8 +5,8 @@ from pprint import pprint
 
 # test crawler services
 # 월간 검색수, 월간 발행수
-print(KeywordServices.getMonthlyPublishedBlogPosts('폼클렌징'))
-print(KeywordServices.getMonthlyPublishedCafePosts('가위'))
+print(KeywordServices.getMonthlyPublishedBlogPosts('키캡'))
+print(KeywordServices.getMonthlyPublishedCafePosts('키캡'))
 
 # 네이버 검색 자동완성 키워드 가져오기
 # 네이버 쇼핑 자동완성 키워드 가져오기
