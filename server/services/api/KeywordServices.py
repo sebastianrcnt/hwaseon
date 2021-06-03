@@ -97,7 +97,7 @@ def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     # 월 발행량
     raw = response.text[6:] # 앞에 쓸데없는 뭐가 많음
     res = json.loads(raw)
-    return res['result']['totalCount']
+    return int(res['result']['totalCount'])
 
 
 def getMonthlyPublishedCafePosts(keyword):
