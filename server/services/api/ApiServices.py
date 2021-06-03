@@ -4,7 +4,8 @@
 
 # client_id = "8VcP69maRqven9qJWV1bs"
 # client_secret = "BH21bBnIJz"
-# api_url = "https://api.naver.com/keywordstool"
+# api_url = "https://api.naver.com/keywordstool
+# api docs: http://naver.github.io/searchad-apidoc/#/guides
 
 import time
 import random
@@ -12,6 +13,7 @@ import requests
 import json
 from . import signature_helper
 import pandas as pd
+from datetime import datetime
 
 
 def get_header(method, uri, api_key, secret_key, customer_id):
@@ -46,15 +48,15 @@ def api_get(params):
 def getKeywordStatistics(keyword):
     """
     {
-          "relKeyword": "키캡",
+          "relKeyword": "키캡", // 키워드
           "monthlyPcQcCnt": 6310, // pc 월검색량
           "monthlyMobileQcCnt": 8880, // 모바일 월검색량
           "monthlyAvePcClkCnt": 22.2, // pc 월 광고클릭
           "monthlyAveMobileClkCnt": 207.0, // 모바일 월 광고클릭
-          "monthlyAvePcCtr": 0.38, // 
-          "monthlyAveMobileCtr": 2.53,
+          "monthlyAvePcCtr": 0.38, // pc 월 클릭전환율
+          "monthlyAveMobileCtr": 2.53, // 모바일 월 클릭전환율
           "plAvgDepth": 15,
-          "compIdx": "높음"
+          "compIdx": "높음" // 경쟁률
     }
     """
 
@@ -62,6 +64,49 @@ def getKeywordStatistics(keyword):
         'hintKeywords': keyword,
         'showDetail': 1,
         'month': 2
-    })
+    })['keywordList']
 
-    return result
+    keywordStatistics = {
+        'monthlyPcQcCnt': result[0]['monthlyPcQcCnt'], # PC 검색량수
+        'monthlyMobileQcCnt': result[0]['monthlyMobileQcCnt'], # 모바일 검색량수
+        'monthlyTotalQcCnt': result[0]['monthlyPcQcCnt'] + result[0]['monthlyMobileQcCnt'],
+        # 'monthlyPublishedCnt': getMonthlyPublishedBlogPosts(keyword)
+    }
+
+
+    return keywordStatistics
+
+# 상댓값 가져오기: 데이터랩
+
+
+def getKeywordRelativeRatio(keyword, byYear=False):
+    month = datetime.now().month
+    year = datetime.now().year
+    headers = {
+        'X-Naver-Client-Id': '8VcP69maRqven9qJWV1b',
+        'X-Naver-Client-Secret': 'BH21bBnIJz'
+    }
+
+    if byYear:
+            body = {
+            'startDate': f'{year-1}-{month:02}-01', # 전월부터
+            'endDate': f'{year}-{month:02}-01', # 이번달까지
+            'timeUnit': 'month', # 
+            'keywordGroups': [
+                {'groupName': keyword, 'keywords': [keyword]}
+            ],
+        }
+    else:
+        body = {
+            'startDate': f'{year}-{(month-1):02}-01', # 전월부터
+            'endDate': f'{year}-{month:02}-01', # 이번달까지
+            'timeUnit': 'month', # 한달간
+            'keywordGroups': [
+                {'groupName': keyword, 'keywords': [keyword]}
+            ],
+        }
+
+    r = requests.post(
+        "https://openapi.naver.com/v1/datalab/search", headers=headers, data=json.dumps(body))
+
+    return r.json()['results'][0]['data']

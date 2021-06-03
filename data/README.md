@@ -1,0 +1,1 @@
+this folder is meant to cache keyword metadata

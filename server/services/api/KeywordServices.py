@@ -1,7 +1,9 @@
 import requests
 import json
+from datetime import datetime
 
 
+# 여기서는 연관키워드 추척
 def getNaverShoppingAutocomplteteKeywords(keyword):
     headers = {
         'authority': 'ac.shopping.naver.com',
@@ -55,6 +57,8 @@ def getNaverSearchAutocomplteteKeywords(keyword):
     return autocomplete_keywords
 
 
+# 여기서부터는 발행량 추적
+
 def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     """
     네이버 블로그 월 발행량 가져오기(기간별)
@@ -93,11 +97,11 @@ def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     res = json.loads(raw)
     return res['result']['totalCount']
 
-
 def getMonthlyPublishedCafePosts(keyword, startDate=None, endDate=None):
     """
-    네이버 블로그 월 발행량 가져오기(기간별)
+    네이버 카페 월 발행량 가져오기(기간별)
     """
+
     headers = {
         'authority': 'apis.naver.com',
         'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -113,12 +117,15 @@ def getMonthlyPublishedCafePosts(keyword, startDate=None, endDate=None):
         'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     }
 
+    month = datetime.now().month
+    year = datetime.now().year
+
     params = {
         'query': keyword,
         'size': '10',
         'recommendKeyword': 'true',
-        # 'writeTime.min': '20201104165548',
-        # 'writeTime.max': '20210504165548',
+        'writeTime.min': f'{year}{(month-1):02}01' + '000000',
+        'writeTime.max': f'{year}{(month):02}01' + '000000',
     }
 
     # if startDate:
@@ -132,3 +139,6 @@ def getMonthlyPublishedCafePosts(keyword, startDate=None, endDate=None):
     # 월 발행량
     # return response.text
     return response.json()['result']['totalCount']
+
+# 검색량
+# https://datalab.naver.com/shoppingInsight/getCategory.naver?cid=0

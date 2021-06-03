@@ -126,4 +126,6 @@ print("--- %s seconds ---" % (time.time() - start_time))
 # 값 합치기
 df6 = pd.DataFrame(main_list, columns=['URL', '7일간 판매량'])
 df7 = pd.merge(df5, df6, on="URL", how='left')
-print(df7)
+df5.to_csv('result_salescount_5.csv')
+df6.to_csv('result_salescount_6.csv')
+df7.to_csv('result_salescount_7.csv')

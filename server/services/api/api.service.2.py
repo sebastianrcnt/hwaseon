@@ -1,5 +1,6 @@
 import requests
 import json
+# 상댓값 가져오기: 데이터랩
 
 headers = {
     'X-Naver-Client-Id': '8VcP69maRqven9qJWV1b',
@@ -7,11 +8,11 @@ headers = {
 }
 
 body = {
-    'startDate': '2020-01-01',
+    'startDate': '2020-04-01',
     'endDate': '2020-05-01',
     'timeUnit': 'month',
     'keywordGroups': [
-        {'groupName': '폼클렌징', 'keywords': ['폼클렌징']}
+        {'groupName': '가위', 'keywords': ['가위', '색종이', '마스크']}
     ],
 }
 
