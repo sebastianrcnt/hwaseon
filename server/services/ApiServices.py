@@ -70,7 +70,7 @@ def getKeywordStatistics(keyword):
         'monthlyPcQcCnt': result[0]['monthlyPcQcCnt'], # PC 검색량수
         'monthlyMobileQcCnt': result[0]['monthlyMobileQcCnt'], # 모바일 검색량수
         'monthlyTotalQcCnt': result[0]['monthlyPcQcCnt'] + result[0]['monthlyMobileQcCnt'],
-        # 'monthlyPublishedCnt': getMonthlyPublishedBlogPosts(keyword)
+        'monthlyPublishedCnt': getMonthlyPublishedBlogPosts(keyword)
     }
 
 
