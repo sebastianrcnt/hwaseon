@@ -25,8 +25,8 @@ NAVER_MOBILE_BLOG_SEARCH_BASE_URL = 'https://m.search.naver.com/search.naver?sm=
 def get_active_html(url):
     '''CSR 완료된 HTML 가져오기'''
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome('./chromedriver', options=options)
+    # options.add_argument("--headless")
+    driver = webdriver.Chrome('./drivers/chromedriver', options=options)
     driver.get(url)
 
     # fetch javascript
@@ -57,10 +57,13 @@ def get_blog_data(blog_id):
             'url': url,
             'viewRank': i + 1
         })
-
+    
     for post in posts:
         post['hashTags'] = get_blog_post_hashtags(post['url'])
-        post['searchRank'] = get_blog_post_naver_main_search_rank(post['id'], post['hashTags'][0])
+        if len(post['hashTags']) == 0:
+            post['searchRank'] = -1 # no rank since no keyword input
+        else:
+            post['searchRank'] = get_blog_post_naver_main_search_rank(post['id'], post['hashTags'][0])
 
     print(json.dumps(posts, ensure_ascii=False, indent=2))
     
@@ -94,7 +97,3 @@ def get_blog_post_naver_main_search_rank(post_id, keyword):
         if found_post_id == post_id:
             return int(rank)
     return 0
-
-
-
-get_blog_data('like5183')
