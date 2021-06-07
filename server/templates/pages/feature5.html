@@ -65,8 +65,8 @@
           },
         },
         { data: "viewRank" },
+        { data: (row) => row?.monthlySearch?.monthlyMobileQcCnt },
         { data: "monthlyPublishedBlogPostCount" },
-        { data: () => 0 },
       ],
     });
 

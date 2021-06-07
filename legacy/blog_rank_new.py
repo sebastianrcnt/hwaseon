@@ -1,6 +1,7 @@
 import json
 import asyncio
 from os import link, write
+from server.services.ApiServices import getMonthlySearchCount
 from server.services.KeywordServices import getMonthlyPublishedBlogPosts
 import time
 from time import sleep
@@ -109,10 +110,12 @@ async def get_blog_data(blog_id):
             post['searchRank'] = -1  # no rank since no keyword input
         else:
             post['searchRank'] = await get_blog_post_naver_main_search_rank(post['id'], main_hashtag)
-        
+
     # get keyword statistics
     for post in posts:
         post['monthlyPublishedBlogPostCount'] = await getMonthlyPublishedBlogPosts(post['mainHashTag'])
+        if post['mainHashTag']:
+            post['monthlySearch'] = await getMonthlySearchCount(post['mainHashTag'])
 
     return posts
 
