@@ -26,5 +26,7 @@
 
 import asyncio
 from legacy.blog_rank_new import get_blog_data
+from pprint import pprint
 
-asyncio.run(get_blog_data('woojung357'))
+data = asyncio.run(get_blog_data('paperchan'))
+pprint(data)

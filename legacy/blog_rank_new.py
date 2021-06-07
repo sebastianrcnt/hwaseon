@@ -17,10 +17,12 @@ from selenium import webdriver
 
 import concurrent.futures
 import pandas as pd
+from pprint import pprint
 
 # CONSTANTS
 BLOG_BASE_URL = 'https://m.blog.naver.com/'
 NAVER_MOBILE_BLOG_SEARCH_BASE_URL = 'https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m_view&oquery=4&tqi=h7Lx1wp0JxCssvUuSC0sssssted-488674&query='
+MAX_POSTS = 15
 
 
 def get_active_html(url):
@@ -31,48 +33,83 @@ def get_active_html(url):
     driver.get(url)
 
     # fetch javascript
-    time.sleep(1)
+    time.sleep(0.1)
+    driver.find_element_by_css_selector('span.sp')
     html = driver.page_source
     driver.close()
     return html
 
+
+async def get_blog_posts(blog_id):
+    cookies = {
+        'NNB': 'XWDYAEPT7C6WA',
+        'BMR': '',
+    }
+
+    headers = {
+        'authority': 'blog.like.naver.com',
+        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+        'accept': '*/*',
+        'sec-ch-ua-mobile': '?0',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+        'sec-fetch-site': 'same-site',
+        'sec-fetch-mode': 'no-cors',
+        'sec-fetch-dest': 'script',
+        'referer': 'https://m.blog.naver.com/cafeinfofam',
+        'accept-language': 'ko',
+        'cookie': 'NNB=XWDYAEPT7C6WA; BMR=',
+        'Connection': 'keep-alive',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'no-cors',
+        'Sec-Fetch-Dest': 'image',
+        'Referer': 'https://m.blog.naver.com/cafeinfofam',
+        'Accept-Language': 'ko',
+    }
+
+    params = (
+        ('blogId', blog_id),
+        ('categoryNo', '0'),
+        ('currentPage', '1'),
+        ('logCode', '0'),
+    )
+
+    response = requests.get(
+        f'https://m.blog.naver.com/rego/ThumbnailPostListInfo.naver', headers=headers, params=params)
+
+    return json.loads(response.text[5:])['result']['postViewList']
+
+
 async def get_blog_data(blog_id):
     '''블로그 정보 가져오기'''
-    url = urljoin(BLOG_BASE_URL, blog_id)
-    html = get_active_html(url)
-    soup = BeautifulSoup(html,'html.parser')
 
-    nickname = soup.select_one('.user_name').text
-
-    post_elements = soup.select('.card_section')
+    post_list_data = await get_blog_posts(blog_id)
+    post_list_data = post_list_data[:MAX_POSTS]
     posts = []
-    for i in range(len(post_elements)):
-        post_element = post_elements[i]
-        title = post_element.select_one('.tit.ell').text
-        url = urljoin(BLOG_BASE_URL, post_element.select_one('a.thumb_link').attrs['href'])
-        post_id = parse_qs(urlparse(url).query)['logNo'][0]
 
+    for i in range(len(post_list_data)):
+        post = post_list_data[i]
+        url = f"https://m.blog.naver.com/PostView.naver?blogId={blog_id}&logNo={post['logNo']}&navType=tl"
         posts.append({
-            'id': post_id,
-            'title': title,
+            'id': post['logNo'],
+            'title': post['titleWithInspectMessage'],
             'url': url,
-            'viewRank': i + 1
+            'viewRank': i + 1,
         })
 
-    st = time.time()
     # get blog hastags
     for post in posts:
         post['hashTags'] = await get_blog_post_hashtags(post['url'])
 
         # auto keyword: first keyword
         if len(post['hashTags']) == 0:
-            post['searchRank'] = -1 # no rank since no keyword input
+            post['searchRank'] = -1  # no rank since no keyword input
         else:
             post['searchRank'] = await get_blog_post_naver_main_search_rank(post['id'], post['hashTags'][0])
-    # print(json.dumps(posts, ensure_ascii=False, indent=2))
 
-    print(f'--- {time.time() - st} seconds ---')
     return posts
+
 
 async def get_blog_post_hashtags(post_url):
     '''블로그 포스트가 태그된 해시태그 목록 가져오기'''
@@ -84,8 +121,9 @@ async def get_blog_post_hashtags(post_url):
 
     tags = tags_element.text
     tags = tags.replace('\n', '').split('#')[1:]
-    
+
     return tags
+
 
 async def get_blog_post_naver_main_search_rank(post_id, keyword):
     '''블로그 포스트가 특정 키워드 하에서 검색순위가 몇위인지?'''
@@ -95,10 +133,11 @@ async def get_blog_post_naver_main_search_rank(post_id, keyword):
 
     # get all <post> search results
     searched_post_elements = soup.select('.bx._svp_item')
-    
+
     for searched_post_element in searched_post_elements:
         rank = searched_post_element.attrs['data-cr-rank']
-        link = searched_post_element.select_one('.total_wrap > a').attrs['href']
+        link = searched_post_element.select_one(
+            '.total_wrap > a').attrs['href']
         found_post_id = safeget(urlparse(link).path.split('/'), 2)
         if found_post_id == post_id:
             return int(rank)
