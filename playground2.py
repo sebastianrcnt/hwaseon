@@ -18,7 +18,6 @@ headers = {
 }
 
 data = '{"query":"가위","page":1,"sortBy":0,"period":["20210503","20210603"]}'
-response = requests.post('https://apis.naver.com/cafe-home-web/cafe-home/v1/search/articles',
-                         headers=headers, data=data.encode('utf-8'))
-                         
+response = requests.post('https://apis.naver.com/cafe-home-web/cafe-home/v1/search/articles', headers=headers, data=data.encode('utf-8'))
+
 pprint(response.json()['message']['result']['totalCount'])

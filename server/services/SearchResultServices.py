@@ -45,5 +45,3 @@ def getMobileSearchSectionOrder(query):
         result.append(title.get_text(strip=True)) 
 
     return result
-
-print(getMobileSearchSectionOrder('폼클렌징'))
