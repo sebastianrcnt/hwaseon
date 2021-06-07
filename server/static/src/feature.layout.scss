@@ -233,3 +233,11 @@ section.keyword-filter {
     }
   }
 }
+
+// .dataTables_wrapper {
+//   z-index: -1;
+// }
+
+header {
+  z-index: 1000;
+}

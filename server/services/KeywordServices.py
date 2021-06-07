@@ -58,8 +58,7 @@ def getNaverSearchAutocomplteteKeywords(keyword):
 
 
 # 여기서부터는 발행량 추적
-
-def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
+async def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     """
     네이버 블로그 월 발행량 가져오기(기간별)
     """

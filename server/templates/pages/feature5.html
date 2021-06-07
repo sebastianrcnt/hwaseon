@@ -52,6 +52,7 @@
 <script>
   $(document).ready(function () {
     let mainTable = $("#table1").DataTable({
+      order: [[2, "asc"]],
       columns: [
         {
           data: (row, type, val, meta) => {
@@ -64,7 +65,7 @@
           },
         },
         { data: "viewRank" },
-        { data: () => 0 },
+        { data: "monthlyPublishedBlogPostCount" },
         { data: () => 0 },
       ],
     });
@@ -72,15 +73,23 @@
     $("button#get-blog-data").on("click", () => {
       const blogId = $("input#blog-id").val();
       if (blogId) {
-        mainTable.clear();
-        axios.get("/api/blog_rank", { params: { blogId } }).then((d) => {
-          const rows = d.data;
-          console.log(rows);
+        $.LoadingOverlay("show");
+        axios
+          .get("/api/blog_rank", { params: { blogId } })
+          .then((d) => {
+            mainTable.clear();
+            let rows = d.data;
+            console.log(rows);
 
-          mainTable.rows.add(rows);
-          mainTable.draw();
-          mainTable.processing = false;
-        });
+            mainTable.rows.add(rows);
+            mainTable.draw();
+          })
+          .catch((e) => {
+            console.log(e);
+          })
+          .finally(() => {
+            $.LoadingOverlay("hide");
+          });
       }
     });
   });

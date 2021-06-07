@@ -224,4 +224,8 @@ section.keyword-filter .right .right-cell textarea {
   padding: 28px 18px;
 }
 
+header {
+  z-index: 1000;
+}
+
 /*# sourceMappingURL=feature.layout.css.map */
