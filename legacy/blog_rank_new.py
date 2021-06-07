@@ -1,4 +1,5 @@
 import json
+import asyncio
 from os import link, write
 import time
 from time import sleep
@@ -35,7 +36,7 @@ def get_active_html(url):
     driver.close()
     return html
 
-def get_blog_data(blog_id):
+async def get_blog_data(blog_id):
     '''블로그 정보 가져오기'''
     url = urljoin(BLOG_BASE_URL, blog_id)
     html = get_active_html(url)
@@ -57,18 +58,23 @@ def get_blog_data(blog_id):
             'url': url,
             'viewRank': i + 1
         })
-    
+
+    st = time.time()
+    # get blog hastags
     for post in posts:
-        post['hashTags'] = get_blog_post_hashtags(post['url'])
+        post['hashTags'] = await get_blog_post_hashtags(post['url'])
+
+        # auto keyword: first keyword
         if len(post['hashTags']) == 0:
             post['searchRank'] = -1 # no rank since no keyword input
         else:
-            post['searchRank'] = get_blog_post_naver_main_search_rank(post['id'], post['hashTags'][0])
+            post['searchRank'] = await get_blog_post_naver_main_search_rank(post['id'], post['hashTags'][0])
+    # print(json.dumps(posts, ensure_ascii=False, indent=2))
 
-    print(json.dumps(posts, ensure_ascii=False, indent=2))
-    
+    print(f'--- {time.time() - st} seconds ---')
+    return posts
 
-def get_blog_post_hashtags(post_url):
+async def get_blog_post_hashtags(post_url):
     '''블로그 포스트가 태그된 해시태그 목록 가져오기'''
     soup = BeautifulSoup(requests.get(post_url).text, 'html.parser')
     tags_element = soup.select_one('.post_tag')
@@ -78,10 +84,10 @@ def get_blog_post_hashtags(post_url):
 
     tags = tags_element.text
     tags = tags.replace('\n', '').split('#')[1:]
-
+    
     return tags
 
-def get_blog_post_naver_main_search_rank(post_id, keyword):
+async def get_blog_post_naver_main_search_rank(post_id, keyword):
     '''블로그 포스트가 특정 키워드 하에서 검색순위가 몇위인지?'''
     # search keyword in mobile naver
     url = NAVER_MOBILE_BLOG_SEARCH_BASE_URL + keyword

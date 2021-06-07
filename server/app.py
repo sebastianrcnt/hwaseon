@@ -1,3 +1,4 @@
+import asyncio
 import json
 from flask import Flask, render_template
 from legacy.blog_rank_new import get_blog_data
@@ -34,5 +35,5 @@ def feature5():  # 대량키워드 요약
 
 @app.route("/api/blog_rank")
 def get_blog_rank():
-    data = get_blog_data('woojung357')
+    data = asyncio.run(get_blog_data('woojung357'))
     return json.dumps(data)

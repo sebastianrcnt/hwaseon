@@ -24,6 +24,7 @@
 # pprint(response.json()['message']['result']['totalCount'])
 
 
+import asyncio
 from legacy.blog_rank_new import get_blog_data
 
-get_blog_data('woojung357')
+asyncio.run(get_blog_data('woojung357'))
