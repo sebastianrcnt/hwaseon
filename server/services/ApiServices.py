@@ -11,14 +11,16 @@ import time
 import random
 import requests
 import json
-from . import signature_helper
 import pandas as pd
 from datetime import datetime
 
 
+from server.services.signature_helper import Signature
+from server.services import CrawlerServices, KeywordServices, SearchResultServices
+
 def get_header(method, uri, api_key, secret_key, customer_id):
     timestamp = str(round(time.time() * 1000))
-    signature = signature_helper.Signature.generate(
+    signature = Signature.generate(
         timestamp, method, uri, SECRET_KEY)
     return {'Content-Type': 'application/json; charset=UTF-8', 'X-Timestamp': timestamp, 'X-API-KEY': API_KEY, 'X-Customer': str(CUSTOMER_ID), 'X-Signature': signature}
 
@@ -69,8 +71,8 @@ def getKeywordStatistics(keyword):
     keywordStatistics = {
         'monthlyPcQcCnt': result[0]['monthlyPcQcCnt'], # PC 검색량수
         'monthlyMobileQcCnt': result[0]['monthlyMobileQcCnt'], # 모바일 검색량수
-        'monthlyTotalQcCnt': result[0]['monthlyPcQcCnt'] + result[0]['monthlyMobileQcCnt'],
-        # 'monthlyPublishedCnt': getMonthlyPublishedBlogPosts(keyword)
+        'monthlyPublishedBlogPostsCnt': KeywordServices.getMonthlyPublishedBlogPosts(keyword),
+        'monthlyPublishedCafePostsCnt': KeywordServices.getMonthlyPublishedCafePosts(keyword),
     }
 
 
