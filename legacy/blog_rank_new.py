@@ -1,7 +1,7 @@
 import json
 import asyncio
 from os import link, write
-from server.services.ApiServices import getMonthlySearchCount
+from server.services.api import getMonthlySearchCount
 from server.services.KeywordServices import getMonthlyPublishedBlogPosts
 import time
 from time import sleep

@@ -7,3 +7,5 @@ server/static/styles/*.css.map
 drivers/*
 result*
 chromedriver
+
+data/*.cache

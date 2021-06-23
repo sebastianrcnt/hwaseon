@@ -32,7 +32,7 @@ def getNaverShoppingAutocomplteteKeywords(keyword):
     return autocomplete_keywords
 
 
-def getNaverSearchAutocomplteteKeywords(keyword):
+def getNaverSearchAutocompleteKeywords(keyword):
     headers = {
         'authority': 'ac.search.naver.com',
         'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -99,7 +99,7 @@ async def getMonthlyPublishedBlogPosts(keyword, startDate=None, endDate=None):
     return int(res['result']['totalCount'])
 
 
-def getMonthlyPublishedCafePosts(keyword):
+async def getMonthlyPublishedCafePosts(keyword):
     """
     네이버 카페 월 발행량 가져오기(기간별)
     """
