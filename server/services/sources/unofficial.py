@@ -172,6 +172,7 @@ def get_PC_search_section_order(query):
 
 
 def get_mobile_search_section_order(query):
+    '''모바일 섹션 순서'''
     response = requests.get(
         f"https://m.search.naver.com/search.naver?query={query}")
     soup = bs4.BeautifulSoup(response.text, "html.parser")
@@ -188,3 +189,30 @@ def get_mobile_search_section_order(query):
         result.append(title.get_text(strip=True))
 
     return result
+
+
+async def fetch_search_category(category_id):
+    '''카테고리 정보 가져오기'''
+    headers = {
+        'authority': 'datalab.naver.com',
+        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+        'accept': '*/*',
+        'x-requested-with': 'XMLHttpRequest',
+        'sec-ch-ua-mobile': '?0',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-dest': 'empty',
+        'referer': 'https://datalab.naver.com/shoppingInsight/sCategory.naver',
+        'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    }
+
+    params = (
+        ('cid', category_id),
+    )
+
+    response = requests.get(
+        'https://datalab.naver.com/shoppingInsight/getCategory.naver', headers=headers, params=params)
+    res = response.json()
+
+    return res

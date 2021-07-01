@@ -4,6 +4,7 @@ from utils.TimeUnitEnum import TimeUnit
 import requests
 import json
 from server.services.tools.officialApiFetcher import fetchOfficialApi
+from typing import List
 
 
 # api: http://naver.github.io/searchad-apidoc/#/operations/GET/~2Fkeywordstool
@@ -34,7 +35,7 @@ async def fetch_related_keywords(keyword, month: int):
     return result
 
 
-async def fetch_relative_ratio(keyword, startDate: datetime.date, endDate: datetime.date, timeUnit: TimeUnit):
+async def fetch_relative_ratio(keywords: List[str], start_date: datetime.date, end_date: datetime.date, time_unit: TimeUnit):
     '''get relative ratio'''
 
     headers = {
@@ -43,15 +44,37 @@ async def fetch_relative_ratio(keyword, startDate: datetime.date, endDate: datet
     }
 
     body = {
-        'startDate': startDate.isoformat(),  # 전월부터
-        'endDate': endDate.isoformat(),  # 이번달까지
-        'timeUnit': timeUnit.value,
-        'keywordGroups': [
-            {'groupName': keyword, 'keywords': [keyword]}
-        ],
+        'startDate': start_date.isoformat(),  # 전월부터
+        'endDate': end_date.isoformat(),  # 이번달까지
+        'timeUnit': time_unit.value,
+        'keywordGroups':
+            list(map(lambda keyword: {
+                'groupName': keyword, 'keywords': [keyword]}, keywords))
     }
 
-    r = requests.post(
+    '''  "ratio": [
+    {
+      "data": [
+        {
+          "period": "2021-05-01",
+          "ratio": 93.98417
+        },
+        {
+          "period": "2021-06-01",
+          "ratio": 100
+        }
+      ],
+      "keywords": [
+        "샴푸"
+      ],
+      "title": "샴푸"
+    }
+  ]'''
+
+    req = requests.post(
         "https://openapi.naver.com/v1/datalab/search", headers=headers, data=json.dumps(body))
 
-    return r.json()['results'][0]['data']
+    raw = req.json()['results']
+    result = [{'keyword': d['keywords'][0], 'data': d['data']} for d in raw]
+
+    return result
