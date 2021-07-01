@@ -1,7 +1,7 @@
 import json
 import asyncio
 from os import link, write
-from server.services.sources.unofficial import get_monthly_published_blog_posts
+from server.services.sources.unofficial import get_blog_post_published_count
 from urllib.parse import urlparse
 from utils.util import safeget
 

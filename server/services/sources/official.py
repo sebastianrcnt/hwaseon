@@ -7,7 +7,7 @@ from server.services.tools.officialApiFetcher import fetchOfficialApi
 
 
 # api: http://naver.github.io/searchad-apidoc/#/operations/GET/~2Fkeywordstool
-async def fetchRelKeywords(keyword, month: int):
+async def fetch_related_keywords(keyword, month: int):
     """
     get absolute ratio
     {
@@ -34,8 +34,7 @@ async def fetchRelKeywords(keyword, month: int):
     return result
 
 
-
-async def getKeywordRelativeRatio(keyword, startDate: datetime.date, endDate: datetime.date, timeUnit: TimeUnit):
+async def fetch_relative_ratio(keyword, startDate: datetime.date, endDate: datetime.date, timeUnit: TimeUnit):
     '''get relative ratio'''
 
     headers = {

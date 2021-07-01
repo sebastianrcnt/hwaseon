@@ -4,6 +4,8 @@ from datetime import datetime
 import bs4
 
 # 여기서는 연관키워드 추척
+
+
 def get_naver_shopping_autocomplete_keywords(keyword):
     headers = {
         'authority': 'ac.shopping.naver.com',
@@ -58,7 +60,7 @@ def getNaverSearchAutocompleteKeywords(keyword):
 
 
 # 여기서부터는 발행량 추적
-async def get_monthly_published_blog_posts(keyword, startDate=None, endDate=None):
+async def get_blog_post_published_count(keyword, start_date: datetime.date, end_date: datetime.date):
     """
     네이버 블로그 월 발행량 가져오기(기간별)
     """
@@ -85,8 +87,8 @@ async def get_monthly_published_blog_posts(keyword, startDate=None, endDate=None
         'keyword': keyword,
         'orderBy': 'sim',
         'type': 'post',
-        'startDate': f'{year}-{(month-1):02}-01',
-        'endDate': f'{year}-{(month):02}-01',
+        'startDate': start_date.isoformat(),
+        'endDate': end_date.isoformat(),
     }
 
     response = requests.get(
@@ -98,13 +100,10 @@ async def get_monthly_published_blog_posts(keyword, startDate=None, endDate=None
     return int(res['result']['totalCount'])
 
 
-async def get_monthly_published_cafe_posts(keyword):
+async def get_cafe_post_published_count(keyword, start_date: datetime.date, end_date: datetime.date):
     """
     네이버 카페 월 발행량 가져오기(기간별)
     """
-
-    month = datetime.now().month
-    year = datetime.now().year
 
     headers = {
         'authority': 'apis.naver.com',
@@ -126,7 +125,7 @@ async def get_monthly_published_cafe_posts(keyword):
         "query": keyword,
         "page": 1,
         "sortBy": 0,
-        "period": [f"{year}{(month-1):02}01", f"{year}{(month):02}01"]
+        "period": [start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d")]
     }
 
     data = json.dumps(data)
@@ -149,7 +148,7 @@ async def get_monthly_published_cafe_posts(keyword):
 """
 
 
-def getPCSearchSectionOrder(query):
+def get_PC_search_section_order(query):
     """
     키워드 검색 시 섹션의 순서 가져오기
     - 예) [파워링크, 네이버쇼핑, VIEW, 지식iN 플레이스, N쇼핑 LIVE]
@@ -172,7 +171,7 @@ def getPCSearchSectionOrder(query):
     return result
 
 
-def getMobileSearchSectionOrder(query):
+def get_mobile_search_section_order(query):
     response = requests.get(
         f"https://m.search.naver.com/search.naver?query={query}")
     soup = bs4.BeautifulSoup(response.text, "html.parser")
