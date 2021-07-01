@@ -1,8 +1,9 @@
 import json
 import asyncio
 from functools import wraps
-from server.services.keyword import getMonthlyPublishedBlogPosts, getMonthlyPublishedCafePosts
+from server.services.sources.unofficial import get_monthly_published_blog_posts, get_monthly_published_cafe_posts
 from flask import Flask, render_template, request
+from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -32,11 +33,13 @@ def async_action(f):
     return wrapped
 
 
-@app.route("/api/v1/keywords/<keyword>/monthly-published-count", methods=['GET'])
+# 발행량
+@app.route("/api/v1/keyword-services/monthly-published-count", methods=['GET'])
 @async_action
-async def get_keyword_statistics(keyword):
-    monthlyPublishedBlogPosts = await getMonthlyPublishedBlogPosts(keyword)
-    monthlyPublishedCafePosts = await getMonthlyPublishedCafePosts(keyword)
+async def get_monthly_published_count():
+    keyword = request.args['keyword']
+    monthlyPublishedBlogPosts = await get_monthly_published_blog_posts(keyword)
+    monthlyPublishedCafePosts = await get_monthly_published_cafe_posts(keyword)
 
     return json.dumps({
         "cafe": monthlyPublishedCafePosts,

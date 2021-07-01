@@ -24,10 +24,10 @@
 # pprint(response.json()['message']['result']['totalCount'])
 
 
-import asyncio
-from server.services.ApiServices import getMonthlySearchCount
-from legacy.blog_rank_new import get_blog_data
-from pprint import pprint
+# import asyncio
+# from server.services.ApiServices import getMonthlySearchCount
+# from legacy.blog_rank_new import get_blog_data
+# from pprint import pprint
 
-data = asyncio.run(getMonthlySearchCount('신촌'))
-pprint(data)
+# data = asyncio.run(getMonthlySearchCount('신촌'))
+# pprint(data)
