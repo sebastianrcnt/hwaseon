@@ -1,22 +1,18 @@
 import json
-import aiohttp
 from json.decoder import JSONDecodeError
 import time
-from utils.util import hasattrs
-
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
+import aiohttp
+import asyncio
 
-from multiprocessing import Process
-import concurrent.futures
-from concurrent.futures.process import ProcessPoolExecutor
-import pandas as pd
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
-}
 
 async def get_naver_shop_salescount(keyword):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+    }   
     url = 'https://search.shopping.naver.com/search/all'
     params = {
         'frm': 'NVSHCHK',
@@ -67,11 +63,11 @@ async def get_naver_shop_salescount(keyword):
             product['url'] = p['mallProductUrl'] # url
             non_ad_rank = non_ad_rank + 1
         products.append(product)
-    for product in products:
-        loop = asyncio.get_event_loop()
-        salescount = loop.run_until_complete(fetch_sales_count(product))
-        # print(salescount)
 
+    tasks = [fetch_sales_count(product) for product in products]
+    salescounts = await asyncio.gather(*tasks)
+    for i in range(len(products)):
+        products[i]['salescounts'] = salescounts[i]
     return products
 
 # 각 URL들어가서 판매량 가져오기
@@ -79,16 +75,11 @@ async def fetch_sales_count(product):
     product_page_url = product['url']
     # link 에 제품 페이지 입력. 모바일, PC 상관없음
 
-    time1 = time.time()
     async with aiohttp.ClientSession() as session:
         async with session.get(product_page_url) as response:
-            req = await response.text()
+            html = await response.text()
 
-    soup = BeautifulSoup(req, 'html.parser')
-
-    time2 = time.time()
-    sub_list = []
-    sub_list.append(product_page_url)
+    soup = BeautifulSoup(html, 'html.parser')
     try:
         k = soup.find_all('script')[1]
         k = str(k)
@@ -102,25 +93,11 @@ async def fetch_sales_count(product):
                 k = jk[i]['leadTimeCount']
                 k_sum = k_sum + k
             # 판매수량 합
-            sub_list.append(k_sum)
+            salescount = k_sum
         except KeyError:
-            sub_list.append('No Sales data')
+            salescount = 'No Sales data'
     except IndexError:
-        sub_list.append('No Storefarm')
+        salescount = 'No Storefarm'
     except JSONDecodeError as e:
-        # print(e)
-        pass
-
-    time3 = time.time()
-
-    print(product['totalRank'], time2-time1, time3-time2)
-    return sub_list
-
-import asyncio
-start = time.time()
-res = asyncio.run(get_naver_shop_salescount('폼클렌징'))
-# print(json.dumps(res, ensure_ascii=False, indent=4))
-end = time.time()
-print(end - start)
-
-# 16.831
+        salescount = "No data"
+    return salescount

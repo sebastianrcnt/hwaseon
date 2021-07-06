@@ -2,36 +2,24 @@ import datetime
 import json
 import asyncio
 from functools import wraps
+from legacy.naver_shop_salescount_new import fetch_sales_count
 
 import requests
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
 from server.services.sources.official import fetch_related_keywords, fetch_relative_ratio
-from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_search_category, get_PC_search_section_order, get_blog_post_published_count, get_cafe_post_published_count, get_mobile_search_section_order, get_naver_search_autocomplete_keywords, get_naver_shopping_autocomplete_keywords
+from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_shopping_products, fetch_search_category, get_PC_search_section_order, get_blog_post_published_count, get_cafe_post_published_count, get_mobile_search_section_order, get_naver_search_autocomplete_keywords, get_naver_shopping_autocomplete_keywords
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# API SERVER
-# @app.route("/api/blog_rank")
-# def get_blog_rank():
-#     blog_id = request.args.get('blogId')
-
-#     if not blog_id:
-#         return 'bad request', 400
-
-#     data = asyncio.run(get_blog_data(blog_id))
-#     return json.dumps(data)
-
-
 """
 - 키워드 검색량(월) - 전월대비
 - 키워드 발행량(월) - 전월대비
 - 쇼핑별 위치
 """
-
 
 def async_action(f):
     @wraps(f)
@@ -60,9 +48,10 @@ async def get_publish_count():
             return "start date should be before end date", 400
     except:
         return "invalid format", 400
-
-    blog = await get_blog_post_published_count(keyword, start_date, end_date)
-    cafe = await get_cafe_post_published_count(keyword, start_date, end_date)
+    blog, cafe = await asyncio.gather(
+        get_blog_post_published_count(keyword, start_date, end_date),
+        get_cafe_post_published_count(keyword, start_date, end_date),
+    )
 
     return json.dumps({
         'keyword': keyword,
@@ -203,3 +192,13 @@ async def get_category_shopping_trending_keywords():
 
     data = await fetch_category_shopping_trending_keywords(category_id, start_date, end_date)
     return jsonify(data)
+
+@app.route("/api/v1/keyword-services/get-naver-shopping-products", methods=['GET'])
+@async_action
+async def get_naver_shopping_products():
+    '''네이버 키워드 상품/판매량 가져오기'''
+    if not 'keyword' in request.args:
+        return 'no keyword', 400
+    keyword = request.args['keyword']
+    products = await fetch_naver_shopping_products(keyword)
+    return jsonify(products)

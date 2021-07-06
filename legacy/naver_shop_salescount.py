@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 import time
 from time import sleep
 
@@ -26,11 +27,11 @@ headers = {
 # 2. AD 구분
 
 # 검색어 입력
-keyword = '폼클렌징'
+keyword = '닭가슴살'
 
 # URL
 url = 'https://search.shopping.naver.com/search/all?frm=NVSHCHK&origQuery=' + keyword + \
-    '&pagingIndex=1&pagingSize=40&productSet=checkout&query=%ED%8F%BC%ED%81%B4%EB%A0%8C%EC%A7%95&sort=rel&timestamp=&viewType=list'
+    '&pagingIndex=1&pagingSize=40&productSet=checkout&query=닭가슴살&sort=rel&timestamp=&viewType=list'
 
 # 해당 URL 및 정보 긁어오기
 req = requests.get(url, headers=headers)
@@ -110,22 +111,25 @@ def get_sales_quantity(link):
         sub_list.append('No Storefarm')
 
     main_list.append(sub_list)
+    # return sub_list
 
+ex = get_sales_quantity('https://www.oliveyoung.co.kr/store/common/partner.do?chlNo=1&chlDtlNo=1&sndType=goods&sndVal=A000000113670')
+print(ex)
 
-# 멀티쓰레드
-start_time = time.time()
+# # 멀티쓰레드
+# start_time = time.time()
 
-u_list = list(df5['URL'])
-main_list = []
+# u_list = list(df5['URL'])
+# main_list = []
 
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    executor.map(get_sales_quantity, u_list)
+# with concurrent.futures.ThreadPoolExecutor() as executor:
+#     executor.map(get_sales_quantity, u_list)
 
-print("--- %s seconds ---" % (time.time() - start_time))
+# print("--- %s seconds ---" % (time.time() - start_time))
 
-# 값 합치기
-df6 = pd.DataFrame(main_list, columns=['URL', '7일간 판매량'])
-df7 = pd.merge(df5, df6, on="URL", how='left')
-df5.to_csv('result_salescount_5.csv')
-df6.to_csv('result_salescount_6.csv')
-df7.to_csv('result_salescount_7.csv')
+# # 값 합치기
+# df6 = pd.DataFrame(main_list, columns=['URL', '7일간 판매량'])
+# df7 = pd.merge(df5, df6, on="URL", how='left')
+# df5.to_csv('result_salescount_5.csv')
+# df6.to_csv('result_salescount_6.csv')
+# df7.to_csv('result_salescount_7.csv')
