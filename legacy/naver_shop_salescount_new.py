@@ -1,5 +1,8 @@
 import json
+import aiohttp
+from json.decoder import JSONDecodeError
 import time
+from utils.util import hasattrs
 
 import requests
 from bs4 import BeautifulSoup
@@ -13,91 +16,79 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
 }
 
-def get_naver_shop_salescount(keyword):
-    pass
-
-### 알고리즘 ###
-# 1. 네이버 쇼핑 > N-pay Click > 특정 검색어 검색!
-# 2. 1page 40개 제품 판매량 및 판매금액 등등 가져오기
-# 2. AD 구분
-
-# 검색어 입력
-keyword = '폼클렌징'
-
-# URL
-# url = 'https://search.shopping.naver.com/search/all?frm=NVSHCHK&origQuery=' + keyword + \
-#     '&pagingIndex=1&pagingSize=40&productSet=checkout&query=%ED%8F%BC%ED%81%B4%EB%A0%8C%EC%A7%95&sort=rel&timestamp=&viewType=list'
-
-url = 'https://search.shopping.naver.com/search/all'
-params = {
-    'frm': 'NVSHCHK',
-    'origQuery': keyword,
-    'pagingIndex': 1,
-    'pagingSize': 40,
-    'productSet': 'checkout',
-    'query': keyword,
-    'sort': 'rel',
-    'viewType': 'list'
-}
-# 해당 URL 및 정보 긁어오기
-req = requests.get(url, headers=headers, params=params)
-req = req.text
-soup = BeautifulSoup(req, 'html.parser')
-
-result = soup.find('script', {'type': 'application/json'})
-result = str(result)
-result = result.replace(
-    '<script id="__NEXT_DATA__" type="application/json">', '')
-result = result.replace('</script>', '')
-result_json = json.loads(result.strip())
-data = result_json['props']['pageProps']['initialState']['products']['list']
-
-products = []
-
-ad_rank = 0
-non_ad_rank = 0
-
-for i in range(0, len(data)):
-    product = {}
-    try:
-        product['url'] = data[i]['item']['adcrUrl'] # url, 
-        product['mallName'] = data[i]['item']['mallName'] # 쇼핑몰
-        product['productName'] = data[i]['item']['productName'] # 제품명
-        product['price'] = data[i]['item']['price'] # 판매가
-        product['deliveryPrice'] = data[i]['item']['dlvryCont'].split('|')[0] # 배송비
-        product['rank'] = ad_rank + 1 # 순위
-        product['totalRank'] = i+1 # 합산순위
-        ad_rank = ad_rank + 1
-    except KeyError as e:
-        print(e)
-        product['url'] = data[i]['item']['mallProductUrl'] # url
-        product['mallName'] = data[i]['item']['mallName'] # 쇼핑몰
-        product['productName'] = data[i]['item']['productName'] # 제품명
-        product['price'] = data[i]['item']['price'] # 판매가
-        product['deliveryPrice'] = data[i]['item']['dlvryCont'].split('|')[0] # 배송비
-        product['rank'] = non_ad_rank+1 # 순위
-        product['totalRank'] = i+1 # 합산순위
-        non_ad_rank = non_ad_rank + 1
-    products.append(product)
-
-
-# df5 = pd.DataFrame(main_list, columns=[
-#                    'URL', '쇼핑몰', '제품명', '판매가', '배송비', '순위', '합산순위'])
-# df5 = df5[['합산순위', '순위', '쇼핑몰', '제품명', '판매가', '배송비', 'URL']]
-# df5 = df5.sort_values(by=['합산순위'], ascending=True)
-# df5 = df5.reset_index(drop=True)
-
-
-# 각 URL들어가서 판매량 가져오기
-def get_sales_quantity(url):
-    # link 에 제품 페이지 입력. 모바일, PC 상관없음
-    page_link = url
-    req = requests.get(page_link)
+async def get_naver_shop_salescount(keyword):
+    url = 'https://search.shopping.naver.com/search/all'
+    params = {
+        'frm': 'NVSHCHK',
+        'origQuery': keyword,
+        'pagingIndex': 1,
+        'pagingSize': 40,
+        'productSet': 'checkout',
+        'query': keyword,
+        'sort': 'rel',
+        'viewType': 'list'
+    }
+    # 해당 URL 및 정보 긁어오기
+    req = requests.get(url, headers=headers, params=params)
     req = req.text
     soup = BeautifulSoup(req, 'html.parser')
 
+    result = soup.find('script', {'type': 'application/json'})
+    result = str(result)
+    result = result.replace(
+        '<script id="__NEXT_DATA__" type="application/json">', '')
+    result = result.replace('</script>', '')
+    result_json = json.loads(result.strip())
+    data = result_json['props']['pageProps']['initialState']['products']['list']
+
+    products = []
+
+    ad_rank = 0
+    non_ad_rank = 0
+
+    for i in range(0, len(data)):
+        p = data[i]['item']
+        is_ad = 'adcrUrl' in p
+        # has_ad_attrs = (hasattrs(p, ['adcrUrl', 'mallName', 'productName', 'price', 'dlvryCont']))
+        # has_non_ad_attrs = (hasattrs(p, ['mallProductUrl', 'mallName', 'productName', 'price', 'dlvryCont']))
+        # print(is_ad ,has_ad_attrs, has_non_ad_attrs, hasattr(p, 'mallProductUrl'))
+        product = {}
+        product['mallName'] = p['mallName'] # 쇼핑몰
+        product['productName'] = p['productName'] # 제품명
+        product['price'] = int(p['price']) # 판매가
+        product['deliveryPrice'] = int(p['dlvryCont'].split('|')[0]) # 배송비
+        product['rank'] = ad_rank + 1 # 순위
+        product['totalRank'] = i+1 # 합산순위
+
+        if is_ad:
+            product['url'] = p['adcrUrl'] 
+            ad_rank = ad_rank + 1
+        else:
+            product['url'] = p['mallProductUrl'] # url
+            non_ad_rank = non_ad_rank + 1
+        products.append(product)
+    for product in products:
+        loop = asyncio.get_event_loop()
+        salescount = loop.run_until_complete(fetch_sales_count(product))
+        # print(salescount)
+
+    return products
+
+# 각 URL들어가서 판매량 가져오기
+async def fetch_sales_count(product):
+    product_page_url = product['url']
+    # link 에 제품 페이지 입력. 모바일, PC 상관없음
+
+    time1 = time.time()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(product_page_url) as response:
+            req = await response.text()
+
+    soup = BeautifulSoup(req, 'html.parser')
+
+    time2 = time.time()
     sub_list = []
-    sub_list.append(url)
+    sub_list.append(product_page_url)
     try:
         k = soup.find_all('script')[1]
         k = str(k)
@@ -106,32 +97,30 @@ def get_sales_quantity(url):
         jk = json.loads(k)
         try:
             jk = jk['product']['A']['productDeliveryLeadTimes']
-            sumk = 0
+            k_sum = 0
             for i in range(0, len(jk)):
                 k = jk[i]['leadTimeCount']
-                sumk = sumk + k
+                k_sum = k_sum + k
             # 판매수량 합
-            sub_list.append(sumk)
+            sub_list.append(k_sum)
         except KeyError:
             sub_list.append('No Sales data')
     except IndexError:
         sub_list.append('No Storefarm')
+    except JSONDecodeError as e:
+        # print(e)
+        pass
 
-    main_list.append(sub_list)
+    time3 = time.time()
 
+    print(product['totalRank'], time2-time1, time3-time2)
+    return sub_list
 
-# 멀티쓰레드
-start_time = time.time()
+import asyncio
+start = time.time()
+res = asyncio.run(get_naver_shop_salescount('폼클렌징'))
+# print(json.dumps(res, ensure_ascii=False, indent=4))
+end = time.time()
+print(end - start)
 
-u_list = list(df5['URL'])
-main_list = []
-
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    executor.map(get_sales_quantity, u_list)
-
-print("--- %s seconds ---" % (time.time() - start_time))
-
-# 값 합치기
-df6 = pd.DataFrame(main_list, columns=['URL', '7일간 판매량'])
-df7 = pd.merge(df5, df6, on="URL", how='left')
-df7.to_json('result.json', force_ascii=False)
+# 16.831
