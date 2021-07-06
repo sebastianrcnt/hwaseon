@@ -6,3 +6,5 @@ def safeget(data, key):
     except KeyError:
         pass
 
+def hasattrs(d: dict, keys: list):
+    return set(keys).issubset(d.keys())

@@ -10,12 +10,6 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-
-from multiprocessing import Process
-import multiprocessing
-import concurrent.futures
-from concurrent.futures.process import ProcessPoolExecutor
 import pandas as pd
 
 ### 알고리즘 ###

@@ -1,40 +1,47 @@
+import pydash
 import requests
 import json
 from datetime import datetime
 import bs4
+import asyncio
 
 # 여기서는 연관키워드 추척
 
 
-def get_naver_shopping_autocomplete_keywords(keyword):
+async def get_naver_shopping_autocomplete_keywords(keyword):
     headers = {
         'authority': 'ac.shopping.naver.com',
-        'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+        'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
         'sec-ch-ua-mobile': '?0',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
         'accept': '*/*',
+        'origin': 'https://search.shopping.naver.com',
         'sec-fetch-site': 'same-site',
-        'sec-fetch-mode': 'no-cors',
-        'sec-fetch-dest': 'script',
-        'referer': 'https://shopping.naver.com/',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-dest': 'empty',
         'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     }
 
-    response = requests.get(
-        'https://ac.shopping.naver.com/ac', headers=headers, params=(
-            ('frm', 'shopping'),
-            ('st', '111111'),
-            ('r_lt', '111111'),
-            ('q', keyword),
-        ))
+    params = (
+        ('frm', 'shopping'),
+        ('q', keyword),
+        ('q_enc', 'UTF-8'),
+        ('r_enc', 'UTF-8'),
+        ('r_format', 'json'),
+        ('r_lt', '111111'),
+        ('r_unicode', '0'),
+        ('st', '111111'),
+        ('t_koreng', '1'),
+    )
 
-    result = response.json()
-    autocomplete_keywords = [keyword_obj[0][0]
-                             for keyword_obj in result['items'][1]]
+    response = requests.get('https://ac.shopping.naver.com/ac', headers=headers, params=params)
+    # print(response.text)
+    data = response.json()
+    autocomplete_keywords = [x[0][0] for x in data['items'][1]]
     return autocomplete_keywords
 
 
-def getNaverSearchAutocompleteKeywords(keyword):
+async def get_naver_search_autocomplete_keywords(keyword):
     headers = {
         'authority': 'ac.search.naver.com',
         'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -216,3 +223,39 @@ async def fetch_search_category(category_id):
     res = response.json()
 
     return res
+
+async def fetch_category_shopping_trending_keywords(category_id, start_date: datetime.date, end_date: datetime.date):
+    headers = {
+        'authority': 'datalab.naver.com',
+        'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
+        'accept': '*/*',
+        'x-requested-with': 'XMLHttpRequest',
+        'sec-ch-ua-mobile': '?0',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'origin': 'https://datalab.naver.com',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-dest': 'empty',
+        'referer': 'https://datalab.naver.com/shoppingInsight/sCategory.naver',
+        'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    }
+
+    data = {
+        'cid': category_id,
+        'timeUnit': 'date',
+        'startDate': start_date.isoformat(),
+        'endDate': end_date.isoformat(),
+        'age': '',
+        'gender': '',
+        'device': '',
+        'page': '1',
+        'count': '100'
+    }
+
+    response = requests.post('https://datalab.naver.com/shoppingInsight/getCategoryKeywordRank.naver', headers=headers, data=data)
+
+
+    # print(response.text)
+    data = response.json()['ranks']
+    return data
