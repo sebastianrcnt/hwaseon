@@ -306,6 +306,7 @@ async def fetch_naver_shopping_products(keyword):
         product['deliveryPrice'] = int(p['dlvryCont'].split('|')[0]) # 배송비
         product['rank'] = ad_rank + 1 # 순위
         product['totalRank'] = i+1 # 합산순위
+        product['isAd'] = is_ad
 
         if is_ad:
             product['url'] = p['adcrUrl'] 
@@ -325,13 +326,11 @@ async def fetch_naver_shopping_products(keyword):
 async def fetch_sales_count(product):
     product_page_url = product['url']
     # link 에 제품 페이지 입력. 모바일, PC 상관없음
-    time1 = time.time()
 
     async with aiohttp.ClientSession() as session:
         async with session.get(product_page_url) as response:
             html = await response.text()
 
-    time2 = time.time()
     soup = bs4.BeautifulSoup(html, 'html.parser')
     try:
         k = soup.find_all('script')[1]
@@ -348,11 +347,9 @@ async def fetch_sales_count(product):
             # 판매수량 합
             salescount = k_sum
         except KeyError:
-            salescount = 'No Sales data'
+            salescount = '데이터 없음'
     except IndexError:
-        salescount = 'No Storefarm'
+        salescount = '스토어팜 아님'
     except JSONDecodeError as e:
-        salescount = "No data"
-    time3 = time.time()
-    print(product['totalRank'], time2-time1, time3-time2)
+        salescount = "데이터 없음"
     return salescount
