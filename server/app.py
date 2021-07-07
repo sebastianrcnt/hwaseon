@@ -27,7 +27,10 @@ def async_action(f):
         return asyncio.run(f(*args, **kwargs))
     return wrapped
 
-
+@app.route("/", methods=['GET'])
+def index():
+    return "Hello World", 200
+    
 @app.route("/api/v1/keyword-services/publish-count", methods=['GET'])
 @async_action
 async def get_publish_count():
