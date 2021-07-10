@@ -2,6 +2,7 @@ import datetime
 import json
 import asyncio
 from functools import wraps
+from server.services.api.blog_statistics import fetch_blog_post_hashtags, fetch_blog_post_naver_main_search_rank, fetch_blog_posts
 from legacy.naver_shop_salescount_new import fetch_sales_count
 
 import requests
@@ -30,14 +31,14 @@ def async_action(f):
 @app.route("/", methods=['GET'])
 def index():
     return "Hello World", 200
-    
+
 @app.route("/api/v1/keyword-services/publish-count", methods=['GET'])
 @async_action
 async def get_publish_count():
     '''발행량'''
     if not hasattrs(request.args, ['keyword', 'startDate']):
         return "keyword, startDate is required", 400
-    
+
     keyword = request.args['keyword']
     try:
         start_date_str = request.args['startDate']
@@ -205,3 +206,36 @@ async def get_naver_shopping_products():
     keyword = request.args['keyword']
     products = await fetch_naver_shopping_products(keyword)
     return jsonify(products)
+
+@app.route("/api/v1/blog-services/get-blog-posts", methods=['GET'])
+@async_action
+async def get_blog_posts():
+    if not 'blogId' in request.args:
+        return 'no blogId', 400
+    blog_id = request.args['blogId']
+    posts = await fetch_blog_posts(blog_id)
+    return jsonify(posts)
+
+@app.route("/api/v1/keyword-services/get-blog-post-naver-main-search-rank", methods=['GET'])
+@async_action
+async def get_blog_post_naver_main_search_rank():
+    if not hasattrs(request.args, ['postId', 'keyword']):
+        return 'no postId/keyword', 400
+    
+    post_id = request.args['postId']
+    keyword = request.args['keyword']
+    rank = await fetch_blog_post_naver_main_search_rank(post_id, keyword)
+    return jsonify(rank)
+
+@app.route("/api/v1/keyword-services/get-blog-post-hashtags", methods=['GET'])
+@async_action
+async def get_blog_post_hashtags():
+    if not hasattrs(request.args, ['blogId', 'postId']):
+        return 'no blogId / postId', 400
+    
+    blog_id = request.args['blogId']
+    post_id = request.args['postId']
+
+    hashtags = await fetch_blog_post_hashtags(blog_id, post_id)
+    
+    return jsonify(hashtags)

@@ -1,6 +1,8 @@
 import json
 import asyncio
-from os import link, write
+import concurrent
+
+import aiohttp
 from server.services.sources.unofficial import get_blog_post_published_count
 from urllib.parse import urlparse
 from utils.util import safeget
@@ -17,55 +19,53 @@ NAVER_MOBILE_BLOG_SEARCH_BASE_URL = 'https://m.search.naver.com/search.naver?sm=
 MAX_POSTS = 15
 
 
-async def get_blog_statistics(blog_id):
-    '''
-    블로그 정보 가져오기
+# async def fetch_blog_statistics(blog_id):
+#     '''
+#     블로그 정보 가져오기
+
+#     1) 글 제목, 글별 키워드(해시태그), View 순위, 통합 View 노출 수, Total 검색량, 컨텐츠 발행량
+#     '''
+
+#     # post 목록 가져오기
+#     post_list_data = await fetch_blog_posts(blog_id)
+#     post_list_data = post_list_data[:MAX_POSTS]
+#     posts = []
+
+#     # post 데이터 추출
+#     for i in range(len(post_list_data)):
+#         post = post_list_data[i]
+#         url = f"https://m.blog.naver.com/PostView.naver?blogId={blog_id}&logNo={post['logNo']}&navType=tl"
+#         posts.append({
+#             'id': post['logNo'],
+#             'title': post['titleWithInspectMessage'],
+#             'url': url,
+#             'viewRank': i + 1,
+#         })
+
+#     # get hashtags
+#     get_hashtag_tasks = [fetch_blog_post_hashtags(post['url']) for post in posts]
+#     post_hashtags = await asyncio.gather(*get_hashtag_tasks)
+#     for i in range(len(post_hashtags)):
+#         post = posts[i]
+#         post['hashTags'] = post_hashtags[i]
+#         main_hash_tag = safeget(post['hashTags'], 0)
+#         post['mainHashTag'] = main_hash_tag
     
-    1) 글 제목, 글별 키워드(해시태그), View 순위, 통합 View 노출 수, Total 검색량, 컨텐츠 발행량
-    '''
+#     # get hashtag search rank
+#     get_search_rank_tasks = [fetch_blog_post_naver_main_search_rank(post['id'], post['mainHashTag']) for post in posts]
+#     post_search_ranks = await asyncio.gather(*get_search_rank_tasks)
+#     for i in range(len(post_search_ranks)):
+#         post = posts[i]
+#         if not post['mainHashTag']:
+#             post['searchRank'] = -1
+#         else:
+#             post['searchRank'] = post_search_ranks[i]
 
-    # post 목록 가져오기
-    post_list_data = await get_blog_posts(blog_id)
-    post_list_data = post_list_data[:MAX_POSTS]
-    posts = []
-
-    # post 데이터 추출
-    for i in range(len(post_list_data)):
-        post = post_list_data[i]
-        url = f"https://m.blog.naver.com/PostView.naver?blogId={blog_id}&logNo={post['logNo']}&navType=tl"
-        posts.append({
-            'id': post['logNo'],
-            'title': post['titleWithInspectMessage'],
-            'url': url,
-            'viewRank': i + 1,
-        })
-
-    # post 해시태그 가져오기(키워드)
-    for post in posts:
-        post['hashTags'] = await get_blog_post_hashtags(post['url'])
-
-        main_hashtag = safeget(post['hashTags'], 0)
-        post['mainHashTag'] = main_hashtag
-        if not main_hashtag:
-            post['searchRank'] = -1  # no rank since no keyword input
-        else:
-            post['searchRank'] = await get_blog_post_naver_main_search_rank(post['id'], main_hashtag)
-
-    # # get keyword statistics
-    # for post in posts:
-    #     post['monthlyPublishedBlogPostCount'] = await get_monthly_published_blog_posts(post['mainHashTag'])
-    #     if post['mainHashTag']:
-    #         post['monthlySearch'] = await getMonthlySearchCount(post['mainHashTag'])
-
-    return posts
+#     return posts
 
 
-async def get_blog_posts(blog_id):
+async def fetch_blog_posts(blog_id):
     '''블로그 포스트 가져오기'''
-    cookies = {
-        'NNB': 'XWDYAEPT7C6WA',
-        'BMR': '',
-    }
 
     headers = {
         'authority': 'blog.like.naver.com',
@@ -96,15 +96,21 @@ async def get_blog_posts(blog_id):
         ('logCode', '0'),
     )
 
-    response = requests.get(
-        f'https://m.blog.naver.com/rego/ThumbnailPostListInfo.naver', headers=headers, params=params)
+    html = requests.get(
+        f'https://m.blog.naver.com/rego/ThumbnailPostListInfo.naver', headers=headers, params=params).text
 
-    return json.loads(response.text[5:])['result']['postViewList']
+    return json.loads(html[5:])['result']['postViewList']
 
 
-async def get_blog_post_hashtags(post_url):
+async def fetch_blog_post_hashtags(blog_id, post_id):
     '''블로그 포스트가 태그된 해시태그 목록 가져오기'''
-    soup = BeautifulSoup(requests.get(post_url).text, 'html.parser')
+    # print(f"[start] crawling post {post_url}")
+    url = f'https://m.blog.naver.com/{blog_id}/{post_id}'
+    print(url)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            html = await response.text()
+    soup = BeautifulSoup(html, 'html.parser')
     tags_element = soup.select_one('.post_tag')
 
     if not tags_element:
@@ -112,18 +118,23 @@ async def get_blog_post_hashtags(post_url):
 
     tags = tags_element.text
     tags = tags.replace('\n', '').split('#')[1:]
-
+    # print(f"[end] crawling post {post_url}")
     return tags
 
 # PART 2: RANK
 
 
-async def get_blog_post_naver_main_search_rank(post_id, keyword):
+async def fetch_blog_post_naver_main_search_rank(post_id, keyword):
     '''블로그 포스트가 특정 키워드 하에서 검색순위가 몇위인지?'''
     # search keyword in mobile naver
+    # print(f'[start] task {post_id}')
     url = NAVER_MOBILE_BLOG_SEARCH_BASE_URL + keyword
-    soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            html = await response.text()
+    soup = BeautifulSoup(html, 'html.parser')
 
+    # print(f'[end] task {post_id}')
     # get all <post> search results
     searched_post_elements = soup.select('.bx._svp_item')
 
@@ -138,5 +149,5 @@ async def get_blog_post_naver_main_search_rank(post_id, keyword):
 
 
 if __name__ == "__main__":
-    res = asyncio.run(get_blog_statistics('dotoree0103'))
+    res = asyncio.run(fetch_blog_statistics('dotoree0103'))
     print(json.dumps(res, ensure_ascii=False))
