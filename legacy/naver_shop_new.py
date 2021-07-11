@@ -1,3 +1,5 @@
+from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures import as_completed
 import json
 import time
 import numpy
@@ -7,6 +9,7 @@ from pprint import pprint
 import urllib
 from urllib.request import Request, urlopen
 import re
+
 
 import requests
 from bs4 import BeautifulSoup
@@ -21,7 +24,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
 }
 
-MAX_PAGE = 5
+MAX_PAGE = 2
 
 
 def getSpecificProductRank(keywordSearchData, productId):
@@ -31,8 +34,6 @@ def getSpecificProductRank(keywordSearchData, productId):
 
 
 # (i)번째 페이지 값 (40개) 가져오기
-
-
 def getKeywordSearchData(keyword):
     pageUrls = []
     print(f"Keyword Search : {keyword}")
@@ -44,10 +45,12 @@ def getKeywordSearchData(keyword):
         pageUrls.append(pageUrl)
 
     keywordSearchData = []
-    for i in range(len(pageUrls)):
-        print(f"- Processing page {i}")
-        pageUrl = pageUrls[i]
-        keywordSearchData += crawlSearchDataByUrl(pageUrl)
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_to_page_url = {executor.submit(
+            crawlSearchDataByUrl, pageUrl): pageUrl for pageUrl in pageUrls}
+        for future in as_completed(future_to_page_url):
+            page_url = future_to_page_url[future]
+            keywordSearchData += future.result()
 
     return keywordSearchData
 
@@ -81,36 +84,36 @@ def crawlSearchDataByUrl(url):
             if short_url[k]['item']['purchaseConditionInfos'] == None:
                 # 광고 맞음
                 # NvMid
-                nvmid = short_url[k]['item']['id']
+                nvmid = int(short_url[k]['item']['id'])
                 # shopID
-                shopid = short_url[k]['item']['mallProductId']
+                shopid = int(short_url[k]['item']['mallProductId'])
                 # 쇼핑몰명
                 shopname = short_url[k]['item']['mallName']
                 # 랭킹
                 rank = k+1
                 # ad 구분
-                ad_check = 'AD'
+                ad_check = True
                 # 묶음상품 순위
                 group_rank = '-'
             else:
                 # 광고 아님
                 # NvMid
-                nvmid = short_url[k]['item']['id']
+                nvmid = int(short_url[k]['item']['id'])
                 # shopID
-                shopid = short_url[k]['item']['mallProductId']
+                shopid = int(short_url[k]['item']['mallProductId'])
                 # 쇼핑몰명
                 shopname = short_url[k]['item']['mallName']
                 # 랭킹
                 rank = k+1
                 # ad 구분
-                ad_check = '-'
+                ad_check = False
                 # 묶음상품 순위
                 group_rank = '-'
             searchedItems.append({
                 'keyword': search_keyword,
                 'adType': ad_check,
                 'rank': rank,
-                # 'groupRank': group_rank,
+                'groupRank': group_rank,
                 'shopName': shopname,
                 'shopId': shopid,
                 'productName': productname,
@@ -119,8 +122,8 @@ def crawlSearchDataByUrl(url):
         # 묶음 상품
         else:
             for m in range(0, len(short_url[k]['item']['lowMallList'])):
-                nvmid = short_url[k]['item']['lowMallList'][m]['nvMid']
-                shopid = short_url[k]['item']['lowMallList'][m]['mallPid']
+                nvmid = int(short_url[k]['item']['lowMallList'][m]['nvMid'])
+                shopid = int(short_url[k]['item']['lowMallList'][m]['mallPid'])
                 shopname = short_url[k]['item']['lowMallList'][m]['name']
                 rank = k+1
                 group_rank = m+1
@@ -129,7 +132,7 @@ def crawlSearchDataByUrl(url):
                     'keyword': search_keyword,
                     'adType': ad_check,
                     'rank': rank,
-                    # 'groupRank': group_rank,
+                    'groupRank': group_rank,
                     'shopName': shopname,
                     'shopId': shopid,
                     'productName': productname,
@@ -144,15 +147,23 @@ keywords = ['수분에센스', '에센스추천', '촉촉한에센스', '피부�
 
 result = ""
 dd = []
-for keyword in keywords:
-    data = getKeywordSearchData(keyword)
-    dd += data
-    rank = getSpecificProductRank(data, '5539145269')
+# for keyword in keywords:
+#     data = getKeywordSearchData(keyword)
+#     dd += data
 
-    result += f'Keyword: {keyword} Rank: {rank}\n'
+with open('result.json', 'w') as f:
+    data = getKeywordSearchData('수분에센스')
+    json.dump(data, f, ensure_ascii=False)
+    print(len(data))
+    rank = getSpecificProductRank(data, 82805606780)
+    print(rank)
 
-df = pd.DataFrame(dd)
-df.to_csv("./result3.csv")
+    # print(data)
+    # rank = getSpecificProductRank(data, 5539145269)
+    # result += f'Keyword: {keyword} Rank: {rank}\n'
+
+# df = pd.DataFrame(dd)
+# df.to_csv("./result3.csv")
 print(result)
 
 """

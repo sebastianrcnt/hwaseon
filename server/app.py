@@ -2,6 +2,7 @@ import datetime
 import json
 import asyncio
 from functools import wraps
+from server.services.sources.proxy import crawl_product_rank_within_keywords
 from server.services.api.blog_statistics import fetch_blog_post_hashtags, fetch_blog_post_naver_main_search_rank, fetch_blog_posts
 from legacy.naver_shop_salescount_new import fetch_sales_count
 
@@ -22,15 +23,18 @@ CORS(app)
 - 쇼핑별 위치
 """
 
+
 def async_action(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         return asyncio.run(f(*args, **kwargs))
     return wrapped
 
+
 @app.route("/", methods=['GET'])
 def index():
     return "Hello World", 200
+
 
 @app.route("/api/v1/keyword-services/publish-count", methods=['GET'])
 @async_action
@@ -90,7 +94,6 @@ async def get_relkeyword_search_statistics():
     })
 
 
-
 @app.route("/api/v1/keyword-services/naver-search-autocomplete", methods=['GET'])
 @async_action
 async def get_naver_search_autocomplete():
@@ -102,6 +105,7 @@ async def get_naver_search_autocomplete():
     related_keywords = await get_naver_search_autocomplete_keywords(keyword)
 
     return jsonify(related_keywords)
+
 
 @app.route("/api/v1/keyword-services/naver-shopping-autocomplete", methods=['GET'])
 @async_action
@@ -175,6 +179,7 @@ async def get_search_category():
 
     return jsonify(categories)
 
+
 @app.route('/api/v1/proxy-services/get-category-shopping-trending-keywords', methods=['GET'])
 @async_action
 async def get_category_shopping_trending_keywords():
@@ -197,6 +202,7 @@ async def get_category_shopping_trending_keywords():
     data = await fetch_category_shopping_trending_keywords(category_id, start_date, end_date)
     return jsonify(data)
 
+
 @app.route("/api/v1/keyword-services/get-naver-shopping-products", methods=['GET'])
 @async_action
 async def get_naver_shopping_products():
@@ -207,6 +213,7 @@ async def get_naver_shopping_products():
     products = await fetch_naver_shopping_products(keyword)
     return jsonify(products)
 
+
 @app.route("/api/v1/blog-services/get-blog-posts", methods=['GET'])
 @async_action
 async def get_blog_posts():
@@ -216,26 +223,38 @@ async def get_blog_posts():
     posts = await fetch_blog_posts(blog_id)
     return jsonify(posts)
 
+
 @app.route("/api/v1/keyword-services/get-blog-post-naver-main-search-rank", methods=['GET'])
 @async_action
 async def get_blog_post_naver_main_search_rank():
     if not hasattrs(request.args, ['postId', 'keyword']):
         return 'no postId/keyword', 400
-    
     post_id = request.args['postId']
     keyword = request.args['keyword']
     rank = await fetch_blog_post_naver_main_search_rank(post_id, keyword)
     return jsonify(rank)
+
 
 @app.route("/api/v1/keyword-services/get-blog-post-hashtags", methods=['GET'])
 @async_action
 async def get_blog_post_hashtags():
     if not hasattrs(request.args, ['blogId', 'postId']):
         return 'no blogId / postId', 400
-    
+
     blog_id = request.args['blogId']
     post_id = request.args['postId']
 
     hashtags = await fetch_blog_post_hashtags(blog_id, post_id)
-    
+
     return jsonify(hashtags)
+
+
+@app.route("/api/v1/product-services/get-product-rank-within-keywords", methods=["POST"])
+@async_action
+async def get_product_rank_within_keywords():
+    body = request.json
+    if not hasattrs(body, ['keywords', 'productId']):
+        return 'no keywords / productId', 400
+    result = crawl_product_rank_within_keywords(
+        body['keywords'], body['productId'])
+    return jsonify(result)
