@@ -2,7 +2,8 @@ import datetime
 import json
 import asyncio
 from functools import wraps
-from server.services.sources.proxy import crawl_product_rank_within_keywords
+from server.services.sources.crawl_naver import crawl_product_rank_within_keywords_naver
+from server.services.sources.crawl_coupang import crawl_product_rank_within_keywords_coupang
 from server.services.api.blog_statistics import fetch_blog_post_hashtags, fetch_blog_post_naver_main_search_rank, fetch_blog_posts
 from legacy.naver_shop_salescount_new import fetch_sales_count
 
@@ -85,6 +86,8 @@ async def get_relkeyword_search_statistics():
     month = int(request.args['month'])
 
     related_keywords = await fetch_related_keywords(keyword, month)
+    if len(related_keywords) < 1:
+        return "error", 400
 
     return jsonify({
         'keyword': keyword,
@@ -249,12 +252,24 @@ async def get_blog_post_hashtags():
     return jsonify(hashtags)
 
 
-@app.route("/api/v1/product-services/get-product-rank-within-keywords", methods=["POST"])
+@app.route("/api/v1/product-services/get-product-rank-within-keywords/coupang", methods=["POST"])
 @async_action
-async def get_product_rank_within_keywords():
+async def get_product_rank_within_keywords_coupang():
     body = request.json
-    if not hasattrs(body, ['keywords', 'productId']):
-        return 'no keywords / productId', 400
-    result = crawl_product_rank_within_keywords(
-        body['keywords'], body['productId'])
+    if not hasattrs(body, ['keywords', 'productUrl']):
+        return 'no keywords / productUrl', 400
+    result = crawl_product_rank_within_keywords_coupang(
+        body['keywords'], body['productUrl'])
+    return jsonify(result)
+
+
+@app.route("/api/v1/product-services/get-product-rank-within-keywords/naver", methods=["POST"])
+@async_action
+async def get_product_rank_within_keywords_naver():
+    body = request.json
+    if not hasattrs(body, ['keywords', 'productUrl']):
+        return 'no keywords / productUrl', 400
+    url = body['productUrl']
+    keywords = body['keywords']
+    result = crawl_product_rank_within_keywords_naver(keywords, url)
     return jsonify(result)

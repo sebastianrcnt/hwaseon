@@ -7,7 +7,7 @@ from pprint import pprint
 import urllib.parse
 
 
-def crawl_product_rank_within_keywords_coupang(keywords, product_id):
+def crawl_product_rank_within_keywords_coupang(keywords, productUrl):
     search_results = {}
     with ProcessPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(
@@ -23,15 +23,17 @@ def crawl_product_rank_within_keywords_coupang(keywords, product_id):
         products = search_results[keyword]
         for idx in range(len(products)):
             product = products[idx]
-            print(product, product['id'] == product_id)
-            if product['id'] == product_id:
+            if product['id'] in productUrl:
                 search_ranks[keyword] = {
                     'rank': idx,
                     'product': product
                 }
                 break
         if keyword not in search_ranks:
-            search_ranks[keyword] = -1
+            search_ranks[keyword] = {
+                'product': None,
+                'rank': -1
+            }
 
     return search_ranks
 
@@ -82,5 +84,5 @@ def crawl_page(keyword, page):
 # pprint(essense)
 # pprint(len(essense))
 
-pprint(crawl_product_rank_within_keywords_coupang(
-    ['브리즈킹', '선풍기'], '1662414493'))
+# pprint(crawl_product_rank_within_keywords_coupang(
+#     ['브리즈킹', '선풍기'], '1662414493'))

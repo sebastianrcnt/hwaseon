@@ -1,5 +1,6 @@
 from enum import Enum
 from datetime import datetime
+from utils.util import safeget
 from utils.TimeUnitEnum import TimeUnit
 import requests
 import json
@@ -29,8 +30,11 @@ async def fetch_related_keywords(keyword, month: int):
         'showDetail': 1,
         'month': month
     })
+    
+    if 'keywordList' not in result:
+        print(result)
 
-    result = result['keywordList']
+    result = safeget(result, 'keywordList') or []
 
     return result
 

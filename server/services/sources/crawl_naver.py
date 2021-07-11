@@ -39,7 +39,7 @@ def getSpecificProductRankAndProduct(keywordSearchData, urlContainingProductId):
 # (i)번째 페이지 값 (40개) 가져오기
 def getKeywordSearchData(keyword):
     pageUrls = []
-    for m in range(1, MAX_PAGE):
+    for m in range(1, MAX_PAGE + 1):
         pageUrl = ('https://search.shopping.naver.com/search/all?frm=NVSCTAB&origQuery=' +
                    keyword + '&pagingIndex=' + str(m) + '&pagingSize=40&productSet=total&query=' +
                    keyword + '&sort=rel&timestamp=&viewType=list')
