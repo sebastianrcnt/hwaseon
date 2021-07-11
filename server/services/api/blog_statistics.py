@@ -19,51 +19,6 @@ NAVER_MOBILE_BLOG_SEARCH_BASE_URL = 'https://m.search.naver.com/search.naver?sm=
 MAX_POSTS = 15
 
 
-# async def fetch_blog_statistics(blog_id):
-#     '''
-#     블로그 정보 가져오기
-
-#     1) 글 제목, 글별 키워드(해시태그), View 순위, 통합 View 노출 수, Total 검색량, 컨텐츠 발행량
-#     '''
-
-#     # post 목록 가져오기
-#     post_list_data = await fetch_blog_posts(blog_id)
-#     post_list_data = post_list_data[:MAX_POSTS]
-#     posts = []
-
-#     # post 데이터 추출
-#     for i in range(len(post_list_data)):
-#         post = post_list_data[i]
-#         url = f"https://m.blog.naver.com/PostView.naver?blogId={blog_id}&logNo={post['logNo']}&navType=tl"
-#         posts.append({
-#             'id': post['logNo'],
-#             'title': post['titleWithInspectMessage'],
-#             'url': url,
-#             'viewRank': i + 1,
-#         })
-
-#     # get hashtags
-#     get_hashtag_tasks = [fetch_blog_post_hashtags(post['url']) for post in posts]
-#     post_hashtags = await asyncio.gather(*get_hashtag_tasks)
-#     for i in range(len(post_hashtags)):
-#         post = posts[i]
-#         post['hashTags'] = post_hashtags[i]
-#         main_hash_tag = safeget(post['hashTags'], 0)
-#         post['mainHashTag'] = main_hash_tag
-    
-#     # get hashtag search rank
-#     get_search_rank_tasks = [fetch_blog_post_naver_main_search_rank(post['id'], post['mainHashTag']) for post in posts]
-#     post_search_ranks = await asyncio.gather(*get_search_rank_tasks)
-#     for i in range(len(post_search_ranks)):
-#         post = posts[i]
-#         if not post['mainHashTag']:
-#             post['searchRank'] = -1
-#         else:
-#             post['searchRank'] = post_search_ranks[i]
-
-#     return posts
-
-
 async def fetch_blog_posts(blog_id):
     '''블로그 포스트 가져오기'''
 
@@ -146,8 +101,3 @@ async def fetch_blog_post_naver_main_search_rank(post_id, keyword):
         if found_post_id == post_id:
             return int(rank)
     return 0
-
-
-if __name__ == "__main__":
-    res = asyncio.run(fetch_blog_statistics('dotoree0103'))
-    print(json.dumps(res, ensure_ascii=False))
