@@ -1,16 +1,13 @@
 from json.decoder import JSONDecodeError
-import time
-import pydash
 import requests
 import json
 from datetime import datetime
 import bs4
 import asyncio
 import aiohttp
-# 여기서는 연관키워드 추척
 
-
-async def get_naver_shopping_autocomplete_keywords(keyword):
+async def fetch_naver_shopping_autocomplete_keywords(keyword):
+    '''네이버 쇼핑 자동완성 키워드 가져오기'''
     headers = {
         'authority': 'ac.shopping.naver.com',
         'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
@@ -36,14 +33,16 @@ async def get_naver_shopping_autocomplete_keywords(keyword):
         ('t_koreng', '1'),
     )
 
-    response = requests.get('https://ac.shopping.naver.com/ac', headers=headers, params=params)
-    # print(response.text)
+    response = requests.get(
+        'https://ac.shopping.naver.com/ac', headers=headers, params=params)
+    
     data = response.json()
     autocomplete_keywords = [x[0][0] for x in data['items'][1]]
     return autocomplete_keywords
 
 
-async def get_naver_search_autocomplete_keywords(keyword):
+async def fetch_naver_search_autocomplete_keywords(keyword):
+    '''네이버 메인 검색 자동완성 키워드 가져오기'''
     headers = {
         'authority': 'ac.search.naver.com',
         'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -56,6 +55,7 @@ async def get_naver_search_autocomplete_keywords(keyword):
         'referer': 'https://www.naver.com/',
         'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     }
+
     response = requests.get(
         'https://ac.search.naver.com/nx/ac', headers=headers, params=(
             ('q', keyword),
@@ -63,12 +63,12 @@ async def get_naver_search_autocomplete_keywords(keyword):
             ('r_format', 'json'),
             ('st', '100'),
         ))
+
     result = response.json()
     autocomplete_keywords = [item[0] for item in result['items'][0]]
     return autocomplete_keywords
 
 
-# 여기서부터는 발행량 추적
 async def get_blog_post_published_count(keyword, start_date: datetime.date, end_date: datetime.date):
     """
     네이버 블로그 월 발행량 가져오기(기간별)
@@ -222,6 +222,7 @@ async def fetch_search_category(category_id):
 
     return res
 
+
 async def fetch_category_shopping_trending_keywords(category_id, start_date: datetime.date, end_date: datetime.date):
     headers = {
         'authority': 'datalab.naver.com',
@@ -251,8 +252,8 @@ async def fetch_category_shopping_trending_keywords(category_id, start_date: dat
         'count': '100'
     }
 
-    response = requests.post('https://datalab.naver.com/shoppingInsight/getCategoryKeywordRank.naver', headers=headers, data=data)
-
+    response = requests.post(
+        'https://datalab.naver.com/shoppingInsight/getCategoryKeywordRank.naver', headers=headers, data=data)
 
     # print(response.text)
     data = response.json()['ranks']
@@ -263,7 +264,7 @@ async def fetch_naver_shopping_products(keyword):
     '''판매량 정보 가져오기'''
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
-    }   
+    }
     url = 'https://search.shopping.naver.com/search/all'
     params = {
         'frm': 'NVSHCHK',
@@ -300,19 +301,19 @@ async def fetch_naver_shopping_products(keyword):
         # has_non_ad_attrs = (hasattrs(p, ['mallProductUrl', 'mallName', 'productName', 'price', 'dlvryCont']))
         # print(is_ad ,has_ad_attrs, has_non_ad_attrs, hasattr(p, 'mallProductUrl'))
         product = {}
-        product['mallName'] = p['mallName'] # 쇼핑몰
-        product['productName'] = p['productName'] # 제품명
-        product['price'] = int(p['price']) # 판매가
-        product['deliveryPrice'] = int(p['dlvryCont'].split('|')[0]) # 배송비
-        product['rank'] = ad_rank + 1 # 순위
-        product['totalRank'] = i+1 # 합산순위
+        product['mallName'] = p['mallName']  # 쇼핑몰
+        product['productName'] = p['productName']  # 제품명
+        product['price'] = int(p['price'])  # 판매가
+        product['deliveryPrice'] = int(p['dlvryCont'].split('|')[0])  # 배송비
+        product['rank'] = ad_rank + 1  # 순위
+        product['totalRank'] = i+1  # 합산순위
         product['isAd'] = is_ad
 
         if is_ad:
-            product['url'] = p['adcrUrl'] 
+            product['url'] = p['adcrUrl']
             ad_rank = ad_rank + 1
         else:
-            product['url'] = p['mallProductUrl'] # url
+            product['url'] = p['mallProductUrl']  # url
             non_ad_rank = non_ad_rank + 1
         products.append(product)
 
@@ -323,6 +324,8 @@ async def fetch_naver_shopping_products(keyword):
     return products
 
 # 각 URL들어가서 판매량 가져오기
+
+
 async def fetch_sales_count(product):
     product_page_url = product['url']
     # link 에 제품 페이지 입력. 모바일, PC 상관없음
