@@ -1,1 +1,0 @@
-sass server/static/src:server/static/styles --watch
