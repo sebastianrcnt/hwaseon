@@ -3,7 +3,7 @@ import asyncio
 import concurrent
 
 import aiohttp
-from server.services.sources.unofficial import get_blog_post_published_count
+from server.services.sources.unofficial import fetch_blog_post_published_count
 from urllib.parse import urlparse
 from utils.util import safeget
 

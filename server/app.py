@@ -11,7 +11,7 @@ import requests
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
 from server.services.sources.official import fetch_related_keywords, fetch_relative_ratio
-from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_shopping_products, fetch_search_category, get_PC_search_section_order, get_blog_post_published_count, get_cafe_post_published_count, get_mobile_search_section_order, get_naver_search_autocomplete_keywords, get_naver_shopping_autocomplete_keywords
+from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_search_related_keywords, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -58,8 +58,8 @@ async def get_publish_count():
     except:
         return "invalid format", 400
     blog, cafe = await asyncio.gather(
-        get_blog_post_published_count(keyword, start_date, end_date),
-        get_cafe_post_published_count(keyword, start_date, end_date),
+        fetch_blog_post_published_count(keyword, start_date, end_date),
+        fetch_cafe_post_published_count(keyword, start_date, end_date),
     )
 
     return json.dumps({
@@ -97,16 +97,25 @@ async def get_relkeyword_search_statistics():
     })
 
 
+@app.route("/api/v1/keyword-services/naver-search-related", methods=['GET'])
+@async_action
+async def get_naver_search_related():
+    '''연관키워드'''
+    if not hasattrs(request.args, ['keyword']):
+        return 'no keyword', 400
+    keyword = request.args['keyword']
+    related_keywords = await fetch_naver_search_related_keywords(keyword)
+    return jsonify(related_keywords)
+
+
 @app.route("/api/v1/keyword-services/naver-search-autocomplete", methods=['GET'])
 @async_action
 async def get_naver_search_autocomplete():
     '''연관키워드'''
     if not hasattrs(request.args, ['keyword']):
         return 'no keyword', 400
-
     keyword = request.args['keyword']
-    related_keywords = await get_naver_search_autocomplete_keywords(keyword)
-
+    related_keywords = await fetch_naver_search_autocomplete_keywords(keyword)
     return jsonify(related_keywords)
 
 
@@ -116,10 +125,8 @@ async def get_naver_shopping_autocomplete():
     '''연관키워드'''
     if not hasattrs(request.args, ['keyword']):
         return 'no keyword', 400
-
     keyword = request.args['keyword']
-    related_keywords = await get_naver_shopping_autocomplete_keywords(keyword)
-
+    related_keywords = await fetch_naver_shopping_autocomplete_keywords(keyword)
     return jsonify(related_keywords)
 
 
@@ -160,8 +167,8 @@ async def get_search_section_order():
     if not hasattrs(request.args, ['keyword']):
         return 'no keyword', 400
     keyword = request.args['keyword']
-    pc_order = get_PC_search_section_order(keyword)
-    mobile_order = get_mobile_search_section_order(keyword)
+    pc_order = fetch_PC_search_section_order(keyword)
+    mobile_order = fetch_mobile_search_section_order(keyword)
 
     return jsonify({
         'keyword': keyword,
