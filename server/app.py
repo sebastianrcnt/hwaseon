@@ -11,7 +11,7 @@ import requests
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
 from server.services.sources.official import fetch_related_keywords, fetch_relative_ratio
-from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_search_related_keywords, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
+from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_search_related_keywords, fetch_naver_shopping_product_count, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -95,6 +95,17 @@ async def get_relkeyword_search_statistics():
         'data': related_keywords[0],
         'keywords': related_keywords[1:]
     })
+
+
+@app.route("/api/v1/keyword-services/naver-shopping-product-count", methods=['GET'])
+@async_action
+async def get_naver_shopping_product_count():
+    '''네이버 쇼핑 제품 개수'''
+    if not hasattrs(request.args, ['keyword']):
+        return 'no keyword', 400
+    keyword = request.args['keyword']
+    product_count = await fetch_naver_shopping_product_count(keyword)
+    return jsonify(product_count)
 
 
 @app.route("/api/v1/keyword-services/naver-search-related", methods=['GET'])

@@ -372,3 +372,17 @@ async def fetch_sales_count(product):
     except JSONDecodeError as e:
         salescount = "데이터 없음"
     return salescount
+
+async def fetch_naver_shopping_product_count(keyword):
+    '''네이버 쇼핑 키워드 검색된 상품 수'''
+    params = {
+        'query': keyword
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://search.shopping.naver.com/search/all', params=params) as response:
+            html = await response.text()
+    
+    soup = bs4.BeautifulSoup(html, 'html.parser')
+    element = soup.select_one(".subFilter_num__2x0jq")
+    return int(element.text.replace(',',''))
