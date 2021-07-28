@@ -1,5 +1,6 @@
 from json.decoder import JSONDecodeError
 import time
+from utils.TimeUnitEnum import TimeUnit
 import pydash
 import requests
 import json
@@ -373,6 +374,7 @@ async def fetch_sales_count(product):
         salescount = "데이터 없음"
     return salescount
 
+
 async def fetch_naver_shopping_product_count(keyword):
     '''네이버 쇼핑 키워드 검색된 상품 수'''
     params = {
@@ -382,7 +384,64 @@ async def fetch_naver_shopping_product_count(keyword):
     async with aiohttp.ClientSession() as session:
         async with session.get('https://search.shopping.naver.com/search/all', params=params) as response:
             html = await response.text()
-    
+
     soup = bs4.BeautifulSoup(html, 'html.parser')
     element = soup.select_one(".subFilter_num__2x0jq")
-    return int(element.text.replace(',',''))
+    if not element:  # 상품수가 없을 때
+        return 0
+    # 상품수가 있음
+    return int(element.text.replace(',', ''))
+
+async def fetch_naver_shopping_keyword_category(keyword):
+    '''키워드의 카테고리 가져오기(categoryId[])'''
+    params = {
+        'query': keyword
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://search.shopping.naver.com/search/all', params=params) as response:
+            html = await response.text()
+    
+    soup = bs4.BeautifulSoup(html, 'html.parser')
+    parent_element = soup.select_one(".basicList_depth__2QIie")
+    category_elements = parent_element.select('a')
+    categories = []
+    for e in category_elements:
+        categories.append(int(e['href'].split('=')[-1]))
+    return categories
+
+
+async def fetch_keyword_graph_statistics(keyword, category_id, time_unit: TimeUnit, start_date: datetime.date, end_date: datetime.date):
+    '''그래프 그리기용'''
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+        'referer': 'https://datalab.naver.com/shoppingInsight/sKeyword.naver',
+        'origin': 'https://datalab.naver.com'
+    }
+
+    data = {
+        'cid': category_id,  # category id
+        'timeUnit': time_unit,  # time unit date/week/month
+        'startDate': start_date.isoformat(),
+        'endDate': end_date.isoformat(),
+        # 'age': '30,40',  # 10/20/30/40/50/60 in commas
+        'age': '',
+        # 'gender': 'f',  # f or f,m or m
+        'gender': '',
+        # 'device': 'pc',  # '' 'pc' 'mo' 'pc,mo'
+        'device': '',
+        'keyword': keyword
+    }
+
+    statistics = {}
+    async with aiohttp.ClientSession() as session:
+        async with session.post('https://datalab.naver.com/shoppingInsight/getKeywordClickTrend.naver', headers=headers, data=data) as response:
+            statistics['clickTrend'] = (await response.json(content_type=None))['result'][0]['data']
+        # async with session.post('https://datalab.naver.com/shoppingInsight/getKeywordDeviceRate.naver', headers=headers, data=data) as response:
+        #     statistics['deviceRate'] = (await response.json(content_type=None))['result'][0]['data']
+        async with session.post('https://datalab.naver.com/shoppingInsight/getKeywordGenderRate.naver', headers=headers, data=data) as response:
+            statistics['genderRate'] = (await response.json(content_type=None))['result'][0]['data']
+        async with session.post('https://datalab.naver.com/shoppingInsight/getKeywordAgeRate.naver', headers=headers, data=data) as response:
+            statistics['ageRate'] = (await response.json(content_type=None))['result'][0]['data']
+
+    return statistics

@@ -11,7 +11,7 @@ import requests
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
 from server.services.sources.official import fetch_related_keywords, fetch_relative_ratio
-from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_naver_search_related_keywords, fetch_naver_shopping_product_count, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
+from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_keyword_graph_statistics, fetch_naver_search_related_keywords, fetch_naver_shopping_keyword_category, fetch_naver_shopping_product_count, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -187,6 +187,14 @@ async def get_search_section_order():
         'mobile': mobile_order,
     })
 
+@app.route("/api/v1/category-services/get-naver-shopping-keyword-category")
+@async_action
+async def get_naver_shopping_keyword_category():
+    if not 'keyword' in request.args:
+        return 'no keyword', 400
+    keyword = request.args['keyword']
+    categories = await fetch_naver_shopping_keyword_category(keyword)
+    return jsonify(categories)
 
 @app.route("/api/v1/proxy-services/get-search-category", methods=['GET'])
 @async_action
@@ -291,3 +299,31 @@ async def get_product_rank_within_keywords_naver():
     keywords = body['keywords']
     result = crawl_product_rank_within_keywords_naver(keywords, url)
     return jsonify(result)
+
+@app.route("/api/v1/keyword-services/fetch_keyword_graph_statistics", methods=['GET'])
+@async_action
+async def get_keyword_graph_statistics():
+    if not hasattrs(request.args, ['categoryId', 'startDate', 'timeUnit', 'keyword']):
+        return "categoryId, startDate, timeUnit, keyword is required. enddate is optional", 400
+    keyword = request.args['keyword']
+    category_id = request.args['categoryId']
+    time_unit = request.args['timeUnit']
+
+    if time_unit not in ['month', 'week', 'date']:
+        return 'timeUnit should be within month, week, date', 400
+    
+    try:
+        start_date_str = request.args['startDate']
+        start_date = datetime.date.fromisoformat(start_date_str)
+        if request.args['endDate']:
+            end_date_str = request.args['endDate']
+            end_date = datetime.date.fromisoformat(end_date_str)
+        else:
+            end_date = datetime.date.today()
+        if start_date > end_date:
+            return "start date should be before end date", 400
+    except:
+        return "invalid format", 400
+
+    statistics = await fetch_keyword_graph_statistics(keyword, category_id, time_unit, start_date, end_date)
+    return jsonify(statistics)
