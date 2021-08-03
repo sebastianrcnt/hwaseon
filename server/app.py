@@ -116,6 +116,7 @@ async def get_naver_search_related():
         return 'no keyword', 400
     keyword = request.args['keyword']
     related_keywords = await fetch_naver_search_related_keywords(keyword)
+    print(related_keywords)
     return jsonify(related_keywords)
 
 
