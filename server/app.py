@@ -5,15 +5,16 @@ from functools import wraps
 from server.services.sources.crawl_naver import crawl_product_rank_within_keywords_naver
 from server.services.sources.crawl_coupang import crawl_product_rank_within_keywords_coupang
 from server.services.api.blog_statistics import fetch_blog_post_hashtags, fetch_blog_post_naver_main_search_rank, fetch_blog_posts
-from legacy.naver_shop_salescount_new import fetch_sales_count
 
-import requests
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
 from server.services.sources.official import fetch_related_keywords, fetch_relative_ratio
 from server.services.sources.unofficial import fetch_category_shopping_trending_keywords, fetch_keyword_graph_statistics, fetch_naver_search_related_keywords, fetch_naver_shopping_keyword_category, fetch_naver_shopping_product_count, fetch_naver_shopping_products, fetch_search_category, fetch_PC_search_section_order, fetch_blog_post_published_count, fetch_cafe_post_published_count, fetch_mobile_search_section_order, fetch_naver_search_autocomplete_keywords, fetch_naver_shopping_autocomplete_keywords
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
+import logging
+logging.basicConfig(filename="logs/errors.log", level=logging.ERROR)
 
 app = Flask(__name__)
 CORS(app)
@@ -34,7 +35,7 @@ def async_action(f):
 
 @app.route("/", methods=['GET'])
 def index():
-    return "Hello World", 200
+    return "API ENTERANCE", 200
 
 
 @app.route("/api/v1/keyword-services/publish-count", methods=['GET'])

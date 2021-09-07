@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 
 import concurrent.futures
-import pandas as pd
 
 # ### 알고리즘 ###
 # 1. 아이디 입력
