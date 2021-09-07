@@ -15,7 +15,6 @@ from multiprocessing import Process
 import multiprocessing
 import concurrent.futures
 from concurrent.futures.process import ProcessPoolExecutor
-import pandas as pd
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'

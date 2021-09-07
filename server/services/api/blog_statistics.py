@@ -10,7 +10,6 @@ from utils.util import safeget
 import requests
 from bs4 import BeautifulSoup
 
-import pandas as pd
 from pprint import pprint
 
 # CONSTANTS

@@ -13,7 +13,6 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 
 ### 알고리즘 ###
 # 1-1. 제품의 nv_mid 값으로 내가 선택한 키워드들 검색시, 순위 찾기
