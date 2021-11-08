@@ -35,7 +35,7 @@ def async_action(f):
 
 @app.route("/", methods=['GET'])
 def index():
-    return "API ENTERANCE", 200
+    return "API ENTRANCE", 200
 
 
 @app.route("/api/v1/keyword-services/publish-count", methods=['GET'])
