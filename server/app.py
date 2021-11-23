@@ -327,3 +327,5 @@ async def get_keyword_graph_statistics():
 
     statistics = await fetch_keyword_graph_statistics(keyword, category_id, time_unit, start_date, end_date)
     return jsonify(statistics)
+
+# change for jenkins test commit
