@@ -5,6 +5,7 @@ from functools import wraps
 from server.services.sources.crawl_naver import crawl_product_rank_within_keywords_naver
 from server.services.sources.crawl_coupang import crawl_product_rank_within_keywords_coupang
 from server.services.api.blog_statistics import fetch_blog_post_hashtags, fetch_blog_post_naver_main_search_rank, fetch_blog_posts
+from server.services.v2.naver_shopping_product_list import NaverShoppingProductListCrawler
 
 from utils.util import hasattrs
 from utils.TimeUnitEnum import TimeUnit
@@ -187,6 +188,7 @@ async def get_search_section_order():
         'mobile': mobile_order,
     })
 
+
 @app.route("/api/v1/category-services/get-naver-shopping-keyword-category")
 @async_action
 async def get_naver_shopping_keyword_category():
@@ -195,6 +197,7 @@ async def get_naver_shopping_keyword_category():
     keyword = request.args['keyword']
     categories = await fetch_naver_shopping_keyword_category(keyword)
     return jsonify(categories)
+
 
 @app.route("/api/v1/proxy-services/get-search-category", methods=['GET'])
 @async_action
@@ -300,6 +303,7 @@ async def get_product_rank_within_keywords_naver():
     result = crawl_product_rank_within_keywords_naver(keywords, url)
     return jsonify(result)
 
+
 @app.route("/api/v1/keyword-services/fetch_keyword_graph_statistics", methods=['GET'])
 @async_action
 async def get_keyword_graph_statistics():
@@ -311,7 +315,7 @@ async def get_keyword_graph_statistics():
 
     if time_unit not in ['month', 'week', 'date']:
         return 'timeUnit should be within month, week, date', 400
-    
+
     try:
         start_date_str = request.args['startDate']
         start_date = datetime.date.fromisoformat(start_date_str)
@@ -328,5 +332,20 @@ async def get_keyword_graph_statistics():
     statistics = await fetch_keyword_graph_statistics(keyword, category_id, time_unit, start_date, end_date)
     return jsonify(statistics)
 
-# change for jenkins test commit
-# some other change
+
+def log_query(func):
+    print(request.args)
+    func()
+
+
+# V2 APIS
+@app.route("/api/v2/naver-shopping-product-list")
+@async_action
+async def get_naver_shopping_product_list_v2():
+    keyword = request.args.get('keyword')
+
+    if not (keyword and True):
+        return "failed", 400
+    c = NaverShoppingProductListCrawler()
+    data = await c.get_shopping_product_list(keyword, max_pages=10)
+    return jsonify(data)
