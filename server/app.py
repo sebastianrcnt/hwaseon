@@ -13,8 +13,6 @@ from server.services.sources.unofficial import fetch_category_shopping_trending_
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-import logging
-logging.basicConfig(filename="logs/errors.log", level=logging.ERROR)
 
 app = Flask(__name__)
 CORS(app)

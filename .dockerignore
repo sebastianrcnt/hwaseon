@@ -1,0 +1,15 @@
+.vscode/
+.venv/
+**/*/__pycache__/
+__pycache__/
+server/static/styles/*.css
+server/static/styles/*.css.map
+drivers/*
+result*
+chromedriver
+
+data/*.cache
+node_modules/
+ssl/
+logs/
+.DS_Store

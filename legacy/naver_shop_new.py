@@ -2,7 +2,6 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from concurrent.futures import as_completed
 import json
 import time
-import numpy
 from time import sleep
 from pprint import pprint
 
